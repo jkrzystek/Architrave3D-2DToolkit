@@ -175,4 +175,107 @@ AI/LLM integration layer. See [AI Bridge Guide](ai-bridge-guide.md) for full det
 - `McpServer` — MCP JSON-RPC server over stdio
 
 ### Adapters
-`DocumentBridge`, `CameraBridge`, `GeometryBridge`, `GraphBridge`, `FluidBridge`, `ErosionBridge`, `InputBridge`, `UiBridge` — each wraps module state in `Arc<RwLock<T>>` and exposes semantic operations.
+`DocumentBridge`, `CameraBridge`, `GeometryBridge`, `GraphBridge`, `FluidBridge`, `ErosionBridge`, `InputBridge`, `UiBridge`, `SceneBridge` — each wraps module state in `Arc<RwLock<T>>` and exposes semantic operations.
+
+---
+
+## toolkit_scene
+
+3D scene graph: a forest of transform nodes stored in a generational arena.
+
+### Transform
+TRS transform: `translation` (Vec3), `rotation` (Quat), `scale` (Vec3). Methods: `to_matrix()`, `from_matrix()`, `mul_transform()`, `transform_point()`, `right()`/`up()`/`forward()`. Constructors: `from_translation`, `from_rotation`, `from_scale`, `IDENTITY`.
+
+### Scene
+Arena of `SceneNode`s addressed by `NodeKey` (index + generation; stale keys are detected). Methods: `add_node()`, `add_child()`, `get()`/`get_mut()`, `set_parent()` (rejects cycles), `remove()` (subtree), `iter()`, `roots()`, `update_world_transforms()` (propagates parent→child), `world_transform()`. `NodeKey::from_raw_parts()` reconstructs handles from wire data.
+
+### SceneNode / NodeData
+Node has `name`, `transform`, `visible`, `data`, cached `world_matrix`. `NodeData` is `Empty`, `Mesh { mesh: MeshId, material: Option<MaterialId> }`, `Light(Light)`, or `Camera`.
+
+### Light / Selection
+`Light` with `LightKind` (Directional, Point{range}, Spot{range,inner,outer}), color, intensity. `Selection` is a node set with an active member (`select_only`, `add`, `toggle`, `remove`, `contains`).
+
+---
+
+## toolkit_topology
+
+Half-edge mesh and topology editing — the adjacency layer indexed meshes lack.
+
+### HalfEdgeMesh
+Half-edge structure (`HalfEdge`, `HeVertex`, `HeFace`, `HeEdge`). Build: `from_mesh(&Mesh)`, `from_polygons(positions, faces)`. Query: `face_vertices()`, `vertex_neighbors()`, `vertex_valence()`, `is_boundary_edge()`, `is_boundary_vertex()`, `euler_characteristic()`. Convert: `to_mesh()` (fan-triangulates), `recompute_normals()`.
+
+### Editing
+`catmull_clark()` → all-quad subdivision (any polygon mesh). `loop_subdivide()` → triangle subdivision (returns `Result`, `TopologyError::NonTriangular` for quads). `flip_edge(edge)` → 2-2 triangle swap. `triangulated()` → fan-triangulate every face.
+
+### MeshSelection
+Independent vertex/edge/face `HashSet`s with a `SelectMode`. Marking UV seams = selecting edges. Methods: `toggle_edge()`, `has_face()`, `count()`, etc.
+
+---
+
+## toolkit_uv
+
+UV unwrapping and atlas packing.
+
+### LSCM
+`unwrap_lscm(positions, triangles)` → `UnwrapResult` (per-vertex UVs in `[0,1]²`). Least Squares Conformal Maps: builds a sparse conformality system solved by `solver::solve_least_squares` (CGLS). `conformal_distortion()` validates the result (≈0 = angle-preserving).
+
+### Projections
+`project_planar(positions, Axis)`, `project_cylindrical`, `project_spherical`, `project_box` — fast, solver-free unwraps.
+
+### Charts & Atlas
+`segment_charts(positions, triangles, seams)` → `Vec<Chart>` (connected patches between seam edges; local vertex remap). `Chart::unwrap()` flattens with LSCM. `unwrap_charts()` does both. `pack_charts(&mut charts, margin)` arranges islands into one `[0,1]²` space (shelf packer); `pack_sizes()` for raw bounding-box sizes. `AtlasPlacement` carries the per-chart `offset`/`scale`.
+
+### solver
+`SparseMatrix` (triplet form, `mul`/`mul_transpose`) and `solve_least_squares` (conjugate-gradient least squares). Dependency-free.
+
+---
+
+## toolkit_gizmo
+
+Renderer-agnostic transform gizmo.
+
+### Gizmo
+`Gizmo { origin, orientation, mode, config }`. `hit_test(ray, view_dir)` → `Option<GizmoHandle>`. Drag: `begin_drag(handle, ray, view_dir)`, `update_drag(ray, view_dir)` → `GizmoDelta`, `end_drag()`. `GizmoMode` (Translate/Rotate/Scale), `GizmoAxis` (X/Y/Z/XY/YZ/XZ/Screen). `GizmoDelta::{Translate(Vec3), Rotate(Quat), Scale(Vec3)}` is cumulative from drag start.
+
+### math
+`closest_param_on_line`, `closest_point_on_line`, `ray_line_distance`, `ray_plane_intersection` — the ray helpers the gizmo (and other pickers) need.
+
+---
+
+## toolkit_canvas
+
+2D editor foundation (the "2D basics" used by the paint and UV editors).
+
+### CanvasView
+2D pan/zoom camera. `canvas_to_screen()`/`screen_to_canvas()`, `pan_pixels()`, `zoom_at(anchor, factor)` (cursor-anchored zoom), `fit_bounds(min, max, padding)`, `visible_bounds()`. Holds `center`, `zoom`, `viewport`, zoom clamps.
+
+### grid
+`adaptive_step(view, target_px)` → "nice" (1/2/5×10ⁿ) spacing that stays readable at any zoom. `grid_lines(view, step)` → visible line coordinates. `snap(point, step)`.
+
+### selection
+`Rect2` (AABB: `from_corners`, `contains`, `intersects`, `area`) and `SelectionDrag` (rubber-band: `begin`/`update`/`finish` → `Rect2`).
+
+---
+
+## toolkit_assets
+
+Asset import/export with a format-neutral result.
+
+### ImportedScene
+`{ meshes: Vec<Mesh>, instances: Vec<MeshInstance> }`. `build_scene()` → `toolkit_scene::Scene` of nodes referencing the meshes by id. Every importer returns this, so downstream code is format-agnostic.
+
+### OBJ
+`import_obj_str()` / `import_obj_path()` (positions, UVs, normals, `o`/`g` groups, polygon fan triangulation, negative indices). `export_obj()` / `export_obj_path()`.
+
+### glTF 2.0
+`import_gltf_slice(bytes)` (`.glb` or self-contained `.gltf` with embedded base64 buffers) and `import_gltf_path()` (resolves external `.bin`). Flattens the node hierarchy to world-space instances. Backed by the `gltf` crate.
+
+---
+
+## toolkit_render (additions)
+
+### PbrMaterial
+Metallic-roughness PBR (glTF workflow): `base_color`, `metallic`, `roughness`, `emissive`+`emissive_strength`, `normal_scale`, `occlusion_strength`, alpha mask, double-sided, and optional texture-map `TextureId`s. Constructors: `dielectric()`, `metal()`. `uniforms()` → `MaterialUniforms` (16-byte-aligned `Pod` block with packed `MaterialFlags`). `PBR_SHADER_WGSL` is a reference Cook-Torrance (GGX) shader.
+
+### Navigation
+`FlyController` (first-person WASD + mouse-look: `look()`, `move_local()`, `apply_to()`, `from_camera()`). Framing: `frame_orbit()`, `frame_camera()`, `framing_distance()` focus the camera on a bounding sphere.

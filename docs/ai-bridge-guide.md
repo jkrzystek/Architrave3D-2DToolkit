@@ -23,8 +23,8 @@ The `toolkit_ai_bridge` crate provides a protocol-agnostic layer for exposing to
 └──┬──────┬──────┬──────┬──────┬──────┬──────┬─────┘
    │      │      │      │      │      │      │
    ▼      ▼      ▼      ▼      ▼      ▼      ▼
-Document Camera Geometry Graph  Fluid Erosion  UI
-Bridge   Bridge  Bridge  Bridge Bridge Bridge Bridge
+Document Camera Geometry Graph  Fluid Erosion UI Scene
+Bridge   Bridge  Bridge  Bridge Bridge Bridge   Bridge
    │      │      │      │      │      │      │
    ▼      ▼      ▼      ▼      ▼      ▼      ▼
 Arc<RwLock<Document>>  etc. (shared app state)
@@ -159,6 +159,24 @@ pub trait AiProvider: Send + Sync {
 | `ui.set_theme_mode` | Switch dark/light |
 | `ui.set_accent_color` | Set accent RGB |
 | `ui.toggle_panel` | Show/hide a panel |
+
+### SceneBridge (`adapter-scene` feature)
+
+| Resources | Description |
+|-----------|-------------|
+| `scene://overview` | Node and root counts |
+| `scene://nodes` | All nodes: id, name, kind, visibility, parent, translation |
+
+| Tools | Description |
+|-------|-------------|
+| `scene.add_node` | Add a transform node (optionally under a parent) |
+| `scene.remove_node` | Remove a node and its subtree |
+| `scene.set_translation` | Set a node's local position |
+| `scene.set_scale` | Set a node's local scale |
+| `scene.set_visible` | Show/hide a node |
+| `scene.reparent` | Move a node under a new parent (cycle-rejecting) |
+
+Nodes are addressed by a stable `"index:generation"` id. Geometry is referenced by id only — never exposed as raw vertex data.
 
 ## Feature Flags
 

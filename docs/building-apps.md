@@ -8,12 +8,17 @@ Pick only the crates you need:
 
 | Building... | You need |
 |-------------|----------|
-| 3D model viewer | `core`, `render`, `geometry`, `ui` |
-| 2D paint app | `core`, `input`, `state`, `render`, `ui` |
+| 3D model viewer | `core`, `render`, `geometry`, `scene`, `assets`, `ui` |
+| 3D modeling tool | `core`, `render`, `geometry`, `topology`, `scene`, `gizmo`, `ui` |
+| UV editor | `core`, `geometry`, `topology`, `uv`, `canvas`, `ui` |
+| 2D paint app | `core`, `input`, `state`, `render`, `canvas`, `ui` |
 | Node-based generator | `core`, `graph`, `geometry`, `render`, `ui` |
 | Terrain editor | `core`, `state`, `render`, `geometry`, `simulation`, `ui` |
-| Headless mesh processor | `core`, `geometry` |
+| Headless mesh processor | `core`, `geometry`, `topology`, `assets` |
 | AI-accessible editor | Any of the above + `ai_bridge` |
+
+See **`docs/3d-pipeline.md`** for a worked example chaining assets → topology
+→ UV → scene → gizmo.
 
 ## Minimal App Setup
 

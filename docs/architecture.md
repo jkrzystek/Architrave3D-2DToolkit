@@ -16,10 +16,20 @@ app-3d-toolkit/
 │   ├── toolkit_graph       Procedural node graph (DAG), evaluation engine
 │   ├── toolkit_simulation  Fluid simulation, hydraulic erosion
 │   ├── toolkit_ui          egui viewport, panels, theme, widgets
+│   ├── toolkit_scene       Transform hierarchy, nodes, lights, selection
+│   ├── toolkit_topology    Half-edge mesh, subdivision, topology editing
+│   ├── toolkit_uv          UV unwrapping (LSCM), charts, atlas packing
+│   ├── toolkit_gizmo       Transform gizmo logic (hit-test + drag deltas)
+│   ├── toolkit_canvas      2D editor view (pan/zoom, grid, selection)
+│   ├── toolkit_assets      OBJ / glTF import & export
 │   └── toolkit_ai_bridge   AI/LLM integration (MCP server, module adapters)
 ├── docs/                   This documentation
 └── toolkitDocs/            Original design documents
 ```
+
+`toolkit_render` also provides PBR materials (`PbrMaterial`,
+`MaterialUniforms`, a reference Cook-Torrance WGSL shader) and camera
+navigation (`FlyController`, framing helpers) alongside the GPU layer.
 
 ## Dependency Graph
 
@@ -75,4 +85,21 @@ The AI integration uses a trait-based abstraction (`AiProvider`) that is indepen
 | `toolkit_graph` | Procedural nodes | `NodeGraph`, `NodeTemplate`, `NodeRegistry`, `evaluate_graph()` |
 | `toolkit_simulation` | Physics | `FluidSim`, `ErosionSim`, `Grid2D<T>` |
 | `toolkit_ui` | Interface | `ViewportPanel`, `WorkspaceLayout`, `ToolkitTheme`, `PropertyGrid` |
+| `toolkit_scene` | Scene graph | `Scene`, `SceneNode`, `NodeKey`, `Transform`, `Light`, `Selection` |
+| `toolkit_topology` | Mesh editing | `HalfEdgeMesh`, `MeshSelection`, subdivision, `flip_edge` |
+| `toolkit_uv` | UV unwrap | `unwrap_lscm`, `Chart`, `segment_charts`, `pack_charts`, projections |
+| `toolkit_gizmo` | Gizmo logic | `Gizmo`, `GizmoMode`, `GizmoAxis`, `GizmoDelta` |
+| `toolkit_canvas` | 2D editor view | `CanvasView`, `adaptive_step`, `SelectionDrag`, `Rect2` |
+| `toolkit_assets` | Asset I/O | `ImportedScene`, `import_obj_str`, `import_gltf_slice`, `export_obj` |
 | `toolkit_ai_bridge` | AI integration | `AiProvider`, `BridgeRegistry`, `McpServer`, per-module adapters |
+
+### Dependencies between the new crates
+
+```
+toolkit_geometry ──┬── toolkit_topology ──── toolkit_uv
+                   ├── toolkit_gizmo
+                   └── toolkit_assets ──── toolkit_scene
+toolkit_scene ───────── (referenced by assets, ai_bridge)
+toolkit_canvas ──────── (standalone: glam only)
+```
+Each still depends only on what it needs; `toolkit_core` remains the common base.
