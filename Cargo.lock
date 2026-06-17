@@ -1341,6 +1341,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_anim"
+version = "0.1.0"
+
+[[package]]
 name = "toolkit_assets"
 version = "0.1.0"
 dependencies = [
@@ -1371,6 +1375,17 @@ dependencies = [
  "proptest",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "toolkit_curves"
+version = "0.1.0"
+
+[[package]]
+name = "toolkit_easing"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -1418,6 +1433,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_meshops"
+version = "0.1.0"
+
+[[package]]
+name = "toolkit_noise"
+version = "0.1.0"
+
+[[package]]
 name = "toolkit_render"
 version = "0.1.0"
 dependencies = [
@@ -1434,6 +1457,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_rng"
+version = "0.1.0"
+
+[[package]]
 name = "toolkit_scene"
 version = "0.1.0"
 dependencies = [
@@ -1442,6 +1469,10 @@ dependencies = [
  "serde_json",
  "toolkit_core",
 ]
+
+[[package]]
+name = "toolkit_sdf"
+version = "0.1.0"
 
 [[package]]
 name = "toolkit_simulation"
@@ -1453,6 +1484,10 @@ dependencies = [
  "serde",
  "toolkit_core",
 ]
+
+[[package]]
+name = "toolkit_spatial"
+version = "0.1.0"
 
 [[package]]
 name = "toolkit_state"

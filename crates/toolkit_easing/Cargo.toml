@@ -1,0 +1,10 @@
+[package]
+name = "toolkit_easing"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Easing curves, interpolation helpers, and time-based tweening"
+
+[dependencies]
+serde = { workspace = true }

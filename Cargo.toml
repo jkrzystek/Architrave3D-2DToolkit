@@ -16,6 +16,14 @@ members = [
     "crates/toolkit_gizmo",
     "crates/toolkit_assets",
     "crates/toolkit_canvas",
+    "crates/toolkit_easing",
+    "crates/toolkit_rng",
+    "crates/toolkit_noise",
+    "crates/toolkit_curves",
+    "crates/toolkit_meshops",
+    "crates/toolkit_spatial",
+    "crates/toolkit_sdf",
+    "crates/toolkit_anim",
 ]
 
 [workspace.package]
@@ -78,3 +86,11 @@ toolkit_uv = { path = "crates/toolkit_uv" }
 toolkit_gizmo = { path = "crates/toolkit_gizmo" }
 toolkit_assets = { path = "crates/toolkit_assets" }
 toolkit_canvas = { path = "crates/toolkit_canvas" }
+toolkit_easing = { path = "crates/toolkit_easing" }
+toolkit_rng = { path = "crates/toolkit_rng" }
+toolkit_noise = { path = "crates/toolkit_noise" }
+toolkit_curves = { path = "crates/toolkit_curves" }
+toolkit_meshops = { path = "crates/toolkit_meshops" }
+toolkit_spatial = { path = "crates/toolkit_spatial" }
+toolkit_sdf = { path = "crates/toolkit_sdf" }
+toolkit_anim = { path = "crates/toolkit_anim" }
