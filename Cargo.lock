@@ -1334,6 +1334,7 @@ dependencies = [
  "toolkit_graph",
  "toolkit_input",
  "toolkit_render",
+ "toolkit_scene",
  "toolkit_simulation",
  "toolkit_state",
  "toolkit_ui",

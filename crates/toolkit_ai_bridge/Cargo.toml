@@ -7,8 +7,9 @@ rust-version.workspace = true
 description = "Protocol-agnostic AI integration bridge for 3dRustToolkit"
 
 [features]
-default = ["adapter-state", "adapter-render", "adapter-geometry", "adapter-graph", "adapter-simulation", "adapter-input", "adapter-ui"]
+default = ["adapter-state", "adapter-render", "adapter-geometry", "adapter-graph", "adapter-simulation", "adapter-input", "adapter-ui", "adapter-scene"]
 adapter-state = ["dep:toolkit_state"]
+adapter-scene = ["dep:toolkit_scene"]
 adapter-render = ["dep:toolkit_render"]
 adapter-geometry = ["dep:toolkit_geometry"]
 adapter-graph = ["dep:toolkit_graph"]
@@ -26,6 +27,7 @@ parking_lot = { workspace = true }
 
 # Optional adapter dependencies
 toolkit_state = { workspace = true, optional = true }
+toolkit_scene = { workspace = true, optional = true }
 toolkit_render = { workspace = true, optional = true }
 toolkit_geometry = { workspace = true, optional = true }
 toolkit_graph = { workspace = true, optional = true }

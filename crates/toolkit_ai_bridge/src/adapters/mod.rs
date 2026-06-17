@@ -1,6 +1,9 @@
 #[cfg(feature = "adapter-state")]
 pub mod state_adapter;
 
+#[cfg(feature = "adapter-scene")]
+pub mod scene_adapter;
+
 #[cfg(feature = "adapter-render")]
 pub mod render_adapter;
 
@@ -21,6 +24,9 @@ pub mod ui_adapter;
 
 #[cfg(feature = "adapter-state")]
 pub use state_adapter::DocumentBridge;
+
+#[cfg(feature = "adapter-scene")]
+pub use scene_adapter::SceneBridge;
 
 #[cfg(feature = "adapter-render")]
 pub use render_adapter::CameraBridge;

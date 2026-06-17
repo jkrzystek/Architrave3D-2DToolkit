@@ -16,6 +16,13 @@ pub struct NodeKey {
 }
 
 impl NodeKey {
+    /// Reconstruct a key from its raw parts (e.g. when received over a wire
+    /// protocol). [`Scene::is_valid`](crate::Scene::is_valid) still guards
+    /// against stale or fabricated keys via the generation check.
+    pub const fn from_raw_parts(index: u32, generation: u32) -> Self {
+        Self { index, generation }
+    }
+
     pub fn index(&self) -> u32 {
         self.index
     }
