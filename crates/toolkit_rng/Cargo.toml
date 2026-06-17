@@ -4,6 +4,8 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
-description = "placeholder"
+description = "Deterministic seeded PRNG (PCG32) with distributions and geometric sampling"
 
 [dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
