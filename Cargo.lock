@@ -1427,6 +1427,7 @@ dependencies = [
  "parking_lot",
  "pollster",
  "serde",
+ "serde_json",
  "toolkit_core",
  "wgpu",
 ]
