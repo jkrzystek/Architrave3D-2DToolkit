@@ -1442,6 +1442,11 @@ dependencies = [
 [[package]]
 name = "toolkit_meshops"
 version = "0.1.0"
+dependencies = [
+ "glam",
+ "toolkit_core",
+ "toolkit_geometry",
+]
 
 [[package]]
 name = "toolkit_noise"
