@@ -1380,6 +1380,13 @@ dependencies = [
 [[package]]
 name = "toolkit_curves"
 version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_core",
+ "toolkit_geometry",
+]
 
 [[package]]
 name = "toolkit_easing"
