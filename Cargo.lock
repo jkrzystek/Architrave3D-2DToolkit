@@ -1508,6 +1508,10 @@ dependencies = [
 [[package]]
 name = "toolkit_spatial"
 version = "0.1.0"
+dependencies = [
+ "glam",
+ "toolkit_geometry",
+]
 
 [[package]]
 name = "toolkit_state"
