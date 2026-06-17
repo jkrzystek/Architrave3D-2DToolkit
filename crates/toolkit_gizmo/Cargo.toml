@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_gizmo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Transform gizmo logic: handle hit-testing and drag deltas (renderer-agnostic)"
+
+[dependencies]
+toolkit_geometry = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

@@ -1,0 +1,37 @@
+[package]
+name = "toolkit_ai_bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Protocol-agnostic AI integration bridge for 3dRustToolkit"
+
+[features]
+default = ["adapter-state", "adapter-render", "adapter-geometry", "adapter-graph", "adapter-simulation", "adapter-input", "adapter-ui"]
+adapter-state = ["dep:toolkit_state"]
+adapter-render = ["dep:toolkit_render"]
+adapter-geometry = ["dep:toolkit_geometry"]
+adapter-graph = ["dep:toolkit_graph"]
+adapter-simulation = ["dep:toolkit_simulation"]
+adapter-input = ["dep:toolkit_input"]
+adapter-ui = ["dep:toolkit_ui"]
+
+[dependencies]
+toolkit_core = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+parking_lot = { workspace = true }
+
+# Optional adapter dependencies
+toolkit_state = { workspace = true, optional = true }
+toolkit_render = { workspace = true, optional = true }
+toolkit_geometry = { workspace = true, optional = true }
+toolkit_graph = { workspace = true, optional = true }
+toolkit_simulation = { workspace = true, optional = true }
+toolkit_input = { workspace = true, optional = true }
+toolkit_ui = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

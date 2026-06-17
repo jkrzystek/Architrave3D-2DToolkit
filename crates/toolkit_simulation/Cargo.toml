@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_simulation"
+description = "Numerical simulation engine (fluid dynamics, erosion, pigment mixing) for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

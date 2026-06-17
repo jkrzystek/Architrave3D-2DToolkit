@@ -1,0 +1,80 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/toolkit_core",
+    "crates/toolkit_input",
+    "crates/toolkit_state",
+    "crates/toolkit_render",
+    "crates/toolkit_geometry",
+    "crates/toolkit_graph",
+    "crates/toolkit_simulation",
+    "crates/toolkit_ui",
+    "crates/toolkit_ai_bridge",
+    "crates/toolkit_scene",
+    "crates/toolkit_topology",
+    "crates/toolkit_uv",
+    "crates/toolkit_gizmo",
+    "crates/toolkit_assets",
+    "crates/toolkit_canvas",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.80"
+
+[workspace.dependencies]
+# Math
+glam = { version = "0.29", features = ["serde"] }
+
+# GPU
+wgpu = "23.0"
+encase = { version = "0.10", features = ["glam"] }
+bytemuck = { version = "1.20", features = ["derive"] }
+pollster = "0.4"
+
+# UI
+egui = "0.31"
+winit = "0.30"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Channels & Async
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+
+# Graph
+petgraph = "0.6"
+
+# Asset I/O
+gltf = "1.4"
+
+# Color
+palette = "0.7"
+
+# Logging
+log = "0.4"
+
+# Testing
+proptest = "1.5"
+
+# Internal crates
+toolkit_core = { path = "crates/toolkit_core" }
+toolkit_input = { path = "crates/toolkit_input" }
+toolkit_state = { path = "crates/toolkit_state" }
+toolkit_render = { path = "crates/toolkit_render" }
+toolkit_geometry = { path = "crates/toolkit_geometry" }
+toolkit_graph = { path = "crates/toolkit_graph" }
+toolkit_simulation = { path = "crates/toolkit_simulation" }
+toolkit_ui = { path = "crates/toolkit_ui" }
+toolkit_ai_bridge = { path = "crates/toolkit_ai_bridge" }
+toolkit_scene = { path = "crates/toolkit_scene" }
+toolkit_topology = { path = "crates/toolkit_topology" }
+toolkit_uv = { path = "crates/toolkit_uv" }
+toolkit_gizmo = { path = "crates/toolkit_gizmo" }
+toolkit_assets = { path = "crates/toolkit_assets" }
+toolkit_canvas = { path = "crates/toolkit_canvas" }

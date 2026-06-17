@@ -1,0 +1,14 @@
+[package]
+name = "toolkit_assets"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Asset import/export: OBJ and glTF, bridging into geometry and scene"
+
+[dependencies]
+toolkit_core = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_scene = { workspace = true }
+glam = { workspace = true }
+gltf = { workspace = true }

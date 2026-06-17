@@ -1,0 +1,18 @@
+[package]
+name = "toolkit_state"
+description = "Document state, layer management, undo/redo, and serialization for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+parking_lot = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

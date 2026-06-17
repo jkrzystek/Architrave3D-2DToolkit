@@ -1,0 +1,17 @@
+[package]
+name = "toolkit_uv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "UV unwrapping (LSCM + projections), charts, and atlas packing"
+
+[dependencies]
+toolkit_core = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_topology = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

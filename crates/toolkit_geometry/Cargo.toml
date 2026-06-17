@@ -1,0 +1,16 @@
+[package]
+name = "toolkit_geometry"
+description = "Mesh data structures, BVH spatial indexing, and raycasting for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+glam = { workspace = true }
+bytemuck = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

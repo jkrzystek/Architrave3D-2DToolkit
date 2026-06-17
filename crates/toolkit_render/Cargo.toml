@@ -1,0 +1,19 @@
+[package]
+name = "toolkit_render"
+description = "GPU rendering backend, pipeline management, and texture caching for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+wgpu = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+encase = { workspace = true }
+bytemuck = { workspace = true }
+parking_lot = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+pollster = { workspace = true }

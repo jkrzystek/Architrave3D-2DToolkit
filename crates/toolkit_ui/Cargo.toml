@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_ui"
+description = "UI framework integration, docking, viewport panels, and theming for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+egui = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

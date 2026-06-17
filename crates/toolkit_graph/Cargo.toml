@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_graph"
+description = "Node-based procedural graph engine with DAG evaluation for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+petgraph = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
