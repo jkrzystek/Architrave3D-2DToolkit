@@ -36,6 +36,7 @@ members = [
     "crates/toolkit_lsystem",
     "crates/toolkit_wfc",
     "crates/toolkit_attributes",
+    "crates/toolkit_volume",
 ]
 
 [workspace.package]
@@ -121,3 +122,4 @@ toolkit_text = { path = "crates/toolkit_text" }
 toolkit_wfc = { path = "crates/toolkit_wfc" }
 toolkit_lsystem = { path = "crates/toolkit_lsystem" }
 toolkit_attributes = { path = "crates/toolkit_attributes" }
+toolkit_volume = { path = "crates/toolkit_volume" }

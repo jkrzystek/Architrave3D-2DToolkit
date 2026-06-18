@@ -15,7 +15,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
   (point/vertex/edge/face/primitive/detail). f32/i32/vec2/vec3/vec4/color/string.
   The Houdini-style backbone: sculpt masks, paint weights, per-element sim data,
   soft-selection weights, multiple UV sets.
-- [ ] **toolkit_volume** — dense 3D scalar/vector grid `Volume<T>` with trilinear
+- [x] **toolkit_volume** — dense 3D scalar/vector grid `Volume<T>` with trilinear
   sampling, gradient, resample, world transform. 3D fluids, voxel sculpt, 3D
   erosion, SDF baking, density fields.
 - [ ] **toolkit_field** — tiny `Field` trait (sample scalar/vector at a point) +

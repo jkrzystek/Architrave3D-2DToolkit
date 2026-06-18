@@ -1690,6 +1690,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_volume"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "toolkit_wfc"
 version = "0.1.0"
 dependencies = [
