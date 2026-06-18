@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_lsystem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "L-system string rewriting with a 3D turtle interpreter for procedural geometry"
+
+[dependencies]
+toolkit_rng = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
