@@ -35,6 +35,7 @@ members = [
     "crates/toolkit_text",
     "crates/toolkit_lsystem",
     "crates/toolkit_wfc",
+    "crates/toolkit_attributes",
 ]
 
 [workspace.package]
@@ -119,3 +120,4 @@ toolkit_convex = { path = "crates/toolkit_convex" }
 toolkit_text = { path = "crates/toolkit_text" }
 toolkit_wfc = { path = "crates/toolkit_wfc" }
 toolkit_lsystem = { path = "crates/toolkit_lsystem" }
+toolkit_attributes = { path = "crates/toolkit_attributes" }

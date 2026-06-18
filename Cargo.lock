@@ -1363,6 +1363,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_attributes"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "toolkit_canvas"
 version = "0.1.0"
 dependencies = [
@@ -1486,6 +1495,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_lsystem"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_rng",
+]
+
+[[package]]
 name = "toolkit_meshops"
 version = "0.1.0"
 dependencies = [
@@ -1606,6 +1625,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_text"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_image",
+]
+
+[[package]]
 name = "toolkit_texture_bake"
 version = "0.1.0"
 dependencies = [
@@ -1658,6 +1687,15 @@ dependencies = [
  "toolkit_core",
  "toolkit_geometry",
  "toolkit_topology",
+]
+
+[[package]]
+name = "toolkit_wfc"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "toolkit_rng",
 ]
 
 [[package]]

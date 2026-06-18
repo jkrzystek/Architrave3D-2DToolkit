@@ -11,7 +11,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 
 ## Tier A — Substrates (build first; everything leans on these)
 
-- [ ] **toolkit_attributes** — named typed attribute channels bound to a domain
+- [x] **toolkit_attributes** — named typed attribute channels bound to a domain
   (point/vertex/edge/face/primitive/detail). f32/i32/vec2/vec3/vec4/color/string.
   The Houdini-style backbone: sculpt masks, paint weights, per-element sim data,
   soft-selection weights, multiple UV sets.
