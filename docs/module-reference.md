@@ -309,3 +309,39 @@ CPU RGBA8 image buffer for texture work and baking. `Image` stores packed sRGB b
 ## toolkit_project
 
 The "open / save my work" bundle. `Project` holds a `Scene` plus the assets its nodes reference — meshes (UVs ride along in their vertices), PBR `materials`, and embedded `textures` — stored as `(id, value)` lists so they serialize to both JSON and binary. `add_mesh`/`add_material`/`add_texture` allocate ids; `insert_*` upserts by id; `mesh`/`material`/`texture` look up. `to_json`/`to_binary` (+ `save_*`/`load_*` files) round-trip the whole bundle; `validate()` reports dangling asset references. `ProjectMetadata` carries name, `UnitSystem`, and generator string.
+
+---
+
+## toolkit_skeleton
+
+Joints, skin weights, posing, and linear-blend skinning. `Skeleton::new(joints)` links `Joint`s by parent index and caches inverse-bind matrices (parent chains are walked, so joint order is free). `Pose` supplies animated local transforms; `Pose::skinning_matrices(&skeleton)` yields the `global_pose * inverse_bind` palette. `apply_skin(mesh, skin, &palette)` deforms a mesh with a per-vertex `Skin` of `SkinWeights` (up to four influences, auto-normalised), blending matrices then transforming position and normal.
+
+---
+
+## toolkit_texture_bake
+
+Project a mesh's surface into UV space and write maps. `rasterize_gbuffer(mesh, w, h)` walks each UV triangle at texel centres into a `GBuffer` of per-texel position + normal. From it: `bake_object_normal_map` (object-space, `n*0.5+0.5`), `bake_position_map` (remapped into a bounds box), and `bake_ambient_occlusion(mesh, gb, samples, max_distance, seed)` — hemisphere ray casting against a BVH, seeded per-texel for reproducibility. Outputs are raw-byte `Image`s (data, not sRGB colour).
+
+---
+
+## toolkit_convex
+
+`convex_hull(points)` builds a `ConvexHull` (deduplicated vertices + outward triangles) via the incremental algorithm: seed a tetrahedron, then for each point remove the faces it sees and refan to the horizon, orienting against a fixed interior point. Provides `contains`, `face_normal`, and `to_mesh`. `gjk_distance(a, b)` / `hulls_intersect(a, b)` measure separation between two convex point sets through their Minkowski difference, with a full simplex sub-distance (point/segment/triangle/tetrahedron) reduction; `0.0` means overlap.
+
+---
+
+## toolkit_text
+
+SDF text, rasterizer-agnostic. `coverage_to_sdf(w, h, coverage, spread)` converts a binary glyph mask to a signed distance field via 8SSEDT (crisp at any scale). `AtlasBuilder` shelf-packs glyph SDF `Image`s into one `FontAtlas`, recording each `Glyph`'s metrics (advance/offset/size) and atlas UV rect. `layout_text(atlas, text, options)` positions a string into `PositionedGlyph` quads with `\n` breaks and greedy word wrap (`LayoutOptions` carries scale, max width, line gap); returns a `TextLayout` with bounds.
+
+---
+
+## toolkit_lsystem
+
+L-systems: `LSystem::new(axiom).rule(pred, succ)` defines rewriting; `expand(iterations)` runs it deterministically, `expand_stochastic(iterations, rng)` chooses among `weighted_rule` alternatives reproducibly. `interpret(string, &TurtleConfig)` runs a 3D turtle (local axes: forward `+Y`, up `+Z`, left `+X`) — `F`/`f` draw/move, `+-&^\/` rotate, `|` reverse, `[`/`]` branch — emitting `Segment`s.
+
+---
+
+## toolkit_wfc
+
+Tiled wave-function collapse. `WfcModel` holds tiles (with weights) and symmetric `allow(tile, Dir, neighbor)` adjacency rules (`Dir::{Right,Left,Up,Down}`). `solve(model, width, height, rng)` repeatedly collapses the lowest-entropy cell to a weighted tile and propagates constraints, returning a row-major `WfcGrid` of tile ids — deterministic per seed, `None` on contradiction.
