@@ -368,6 +368,69 @@ types from every module. Apps add one import:
 use toolkit_prelude::*;
 ```
 
+### 10. Module generality audit — which crates carry app-specific assumptions
+
+Every crate was designed with a "will this work in multiple apps?" test.
+Most pass. A few have implicit assumptions from the original app they
+served. Knowing these lets you decide when to use the crate as-is vs.
+fork/extend.
+
+| Crate | Verdict | Why |
+|-------|---------|-----|
+| `toolkit_core` | ✅ **General** | IDs, events, commands, color math — no app assumptions |
+| `toolkit_input` | ✅ **General** | Stroke stabilizer works for any pointer-driven app |
+| `toolkit_state` | ⚠️ **Paint-app bias** | `LayerKind::Paint / Fill / Folder / Mask / Adjustment` assume a 2D compositing app. The `HistoryStack` undo/redo is fully general, but the layer tree carries art-app assumptions |
+| `toolkit_render` | ✅ **General** | Camera, OrbitController, PBR material, FlyController — reusable in any 3D app |
+| `toolkit_geometry` | ✅ **General** | Mesh, BVH, ray — universal 3D types |
+| `toolkit_graph` | ✅ **General** | Node graph DAG — any procedural system |
+| `toolkit_simulation` | ⚠️ **Domain-specific** | `FluidSim` (2D stable fluids) and `ErosionSim` (hydraulic) are correct but narrow — they serve terrain/fluid editors specifically, not general simulation |
+| `toolkit_ui` | ⚠️ **Default-layout bias** | The `WorkspaceLayout` defaults (3D Viewport, 2D Canvas, Layers, Properties, Color Picker) mirror a specific app. The `ToolkitTheme` and `PropertyGrid` widgets are fully general |
+| `toolkit_scene` | ✅ **General** | Transform hierarchy, lights, selection — universal 3D scene graph |
+| `toolkit_topology` | ✅ **General** | Half-edge mesh — standard geometry processing |
+| `toolkit_uv` | ✅ **General** | LSCM unwrap, atlas packing — any 3D app needing UVs |
+| `toolkit_gizmo` | ✅ **General** | Translate/rotate/scale gizmo — any 3D manipulator |
+| `toolkit_canvas` | ✅ **General** | 2D pan/zoom/grid — any 2D viewport |
+| `toolkit_assets` | ✅ **General** | OBJ/glTF — universal 3D formats |
+| `toolkit_ai_bridge` | ⚠️ **Adapter bias** | The `AiProvider` trait and `McpServer` are fully general. But the adapter implementations (`DocumentBridge`, `CameraBridge`, `SceneBridge`) assume an editor-wrapping pattern. Rolling a game or a headless processor needs new adapters |
+| `toolkit_attributes` | ✅ **General** | Columnar attribute channels — geometry/sim/particle data storage |
+| `toolkit_volume` | ✅ **General** | Dense 3D grid — fluids, SDF baking, voxel sculpt |
+| `toolkit_field` | ✅ **General** | `Field` trait + combinators — pure math composition |
+| `toolkit_solver` | ✅ **General** | CG, Gauss-Seidel, Jacobi — any linear system |
+| `toolkit_brush` | ✅ **General** | Falloff profiles + dab spacing — shared by sculpt, paint, terrain, weight |
+| `toolkit_meshedit` | ✅ **General** | Extrude/inset/bevel/bridge — standard modeling ops |
+| `toolkit_select` | ✅ **General** | Weighted selection + adjacency — any element-picking |
+| `toolkit_polyline` | ✅ **General** | Resample / smooth / simplify — 2D or 3D paths |
+| `toolkit_triangulate` | ✅ **General** | Ear-clip + Delaunay — any 2D poly fill |
+| `toolkit_surfacing` | ✅ **General** | Extrude / loft / revolve / sweep — CAD basics |
+| `toolkit_voxelize` | ✅ **General** | Mesh→SDF volume — bridge between surface and volumetric |
+| `toolkit_remesh` | ✅ **General** | QEM decimate + cluster remesh — LOD/cleanup |
+| `toolkit_meshops` | ✅ **General** | Weld / normals / flip / merge / smooth — utilities |
+| `toolkit_anim` | ✅ **General** | Keyframe tracks + scene transform drive |
+| `toolkit_curves` | ✅ **General** | Bezier, B-spline, NURBS — CAD standard |
+| `toolkit_easing` | ✅ **General** | Pure-math easing + tweening — universally reusable |
+| `toolkit_noise` | ✅ **General** | Perlin/Simplex/Worley/FBM — pure functions |
+| `toolkit_rng` | ✅ **General** | PCG32 + geometric distributions — universally reusable |
+| `toolkit_sdf` | ✅ **General** | Sphere/Box/CSG → Mesh — implicit modeling |
+| `toolkit_spatial` | ✅ **General** | Kd-tree / octree / hash grid — spatial queries |
+| `toolkit_units` | ✅ **General** | Length units — CAD / any measurement app |
+| `toolkit_color` | ✅ **General** | HSV/Oklab/gradients — universal color math |
+| `toolkit_intersect` | ✅ **General** | Frustum/plane/capsule intersection — any spatial app |
+| `toolkit_image` | ✅ **General** | RGBA buffer + PNG — texture work, baking, screenshots |
+| `toolkit_project` | ✅ **General** | Scene+mesh+material bundle — any 3D app with save/load |
+| `toolkit_skeleton` | ✅ **General** | Joint hierarchy + LBS skinning — character rigging |
+| `toolkit_texture_bake` | ✅ **General** | UV raster → AO/normal maps — any baking pipeline |
+| `toolkit_convex` | ✅ **General** | QuickHull + GJK — collision, bounds, physics |
+| `toolkit_text` | ✅ **General** | SDF font atlas + layout — UI, labels, measurements |
+| `toolkit_lsystem` | ✅ **General** | Grammar + turtle — procedural generation |
+| `toolkit_wfc` | ✅ **General** | Tile adjacency → grid — procedural generation |
+
+**Summary:** 38 of 46 crates are general-purpose. The 8 with caveats
+(`toolkit_state`, `toolkit_simulation`, `toolkit_ui`, `toolkit_ai_bridge`
+adapters, plus the 4 not-yet-implemented) carry assumptions from the
+original editor they served. This is not a problem — it's an honest
+inventory. When you build a new app in a different domain (e.g. game,
+CAD, data viz), you'll know which crates to vendor and which to extend.
+
 ### Summary
 
 The toolkit is **well-designed for the growing-reusable-library model**. The
