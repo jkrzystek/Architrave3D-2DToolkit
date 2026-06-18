@@ -1493,6 +1493,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_project"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_core",
+ "toolkit_geometry",
+ "toolkit_image",
+ "toolkit_render",
+ "toolkit_scene",
+ "toolkit_units",
+]
+
+[[package]]
 name = "toolkit_render"
 version = "0.1.0"
 dependencies = [

@@ -28,6 +28,7 @@ members = [
     "crates/toolkit_color",
     "crates/toolkit_intersect",
     "crates/toolkit_image",
+    "crates/toolkit_project",
 ]
 
 [workspace.package]

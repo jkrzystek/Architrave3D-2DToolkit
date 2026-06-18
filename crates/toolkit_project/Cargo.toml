@@ -1,0 +1,21 @@
+[package]
+name = "toolkit_project"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Serializable project bundle (scene + meshes + materials + textures) with JSON and binary I/O"
+
+[dependencies]
+toolkit_core = { workspace = true }
+toolkit_scene = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_render = { workspace = true }
+toolkit_image = { workspace = true }
+toolkit_units = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+
+[dev-dependencies]
+glam = { workspace = true }
