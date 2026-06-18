@@ -1563,6 +1563,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_skeleton"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_geometry",
+ "toolkit_scene",
+]
+
+[[package]]
 name = "toolkit_spatial"
 version = "0.1.0"
 dependencies = [

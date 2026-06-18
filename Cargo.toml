@@ -29,6 +29,7 @@ members = [
     "crates/toolkit_intersect",
     "crates/toolkit_image",
     "crates/toolkit_project",
+    "crates/toolkit_skeleton",
 ]
 
 [workspace.package]
@@ -107,3 +108,9 @@ toolkit_color = { path = "crates/toolkit_color" }
 toolkit_intersect = { path = "crates/toolkit_intersect" }
 toolkit_image = { path = "crates/toolkit_image" }
 toolkit_project = { path = "crates/toolkit_project" }
+toolkit_skeleton = { path = "crates/toolkit_skeleton" }
+toolkit_texture_bake = { path = "crates/toolkit_texture_bake" }
+toolkit_convex = { path = "crates/toolkit_convex" }
+toolkit_text = { path = "crates/toolkit_text" }
+toolkit_wfc = { path = "crates/toolkit_wfc" }
+toolkit_lsystem = { path = "crates/toolkit_lsystem" }
