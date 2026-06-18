@@ -39,7 +39,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 
 ## Tier C — Geometry generation / processing
 
-- [ ] **toolkit_triangulate** — robust 2D polygon triangulation (ear clipping with
+- [x] **toolkit_triangulate** — robust 2D polygon triangulation (ear clipping with
   holes + constrained Delaunay). 2D procedural shapes, CAD profile faces.
 - [ ] **toolkit_surfacing** — surface generation from profiles: extrude, loft,
   revolve, sweep-along-curve. CAD + procedural.

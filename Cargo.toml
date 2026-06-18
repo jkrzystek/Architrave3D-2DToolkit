@@ -43,6 +43,7 @@ members = [
     "crates/toolkit_meshedit",
     "crates/toolkit_select",
     "crates/toolkit_polyline",
+    "crates/toolkit_triangulate",
 ]
 
 [workspace.package]
@@ -135,3 +136,4 @@ toolkit_brush = { path = "crates/toolkit_brush" }
 toolkit_meshedit = { path = "crates/toolkit_meshedit" }
 toolkit_select = { path = "crates/toolkit_select" }
 toolkit_polyline = { path = "crates/toolkit_polyline" }
+toolkit_triangulate = { path = "crates/toolkit_triangulate" }
