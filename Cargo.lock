@@ -1372,6 +1372,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_color"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "toolkit_core",
+]
+
+[[package]]
 name = "toolkit_core"
 version = "0.1.0"
 dependencies = [
