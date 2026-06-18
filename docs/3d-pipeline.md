@@ -143,3 +143,18 @@ Wrap the scene in `Arc<RwLock<Scene>>` and register `SceneBridge` (see
 [AI Bridge Guide](ai-bridge-guide.md)) so an MCP client can add nodes, move
 them, and reparent — the same operations the gizmo performs, but driven by an
 agent.
+
+## Other Pipeline Paths
+
+This was one path through the toolkit. Here are others:
+
+```
+SDF modeling:     primitives → CSG → polygonize → mesh
+Procedural:       noise + rng + field → sdf / volume → remesh → mesh
+CAD:              curves → surfacing → meshops → topology
+Terrain:          noise → simulation(erosion) → brush → mesh
+Scatter:          rng(poisson) → scene instancing
+```
+
+See the relevant crate docs in `module-reference.md`, or the quick-start
+sections in `building-apps.md` for each pattern.

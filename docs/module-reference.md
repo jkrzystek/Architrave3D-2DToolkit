@@ -179,6 +179,63 @@ AI/LLM integration layer. See [AI Bridge Guide](ai-bridge-guide.md) for full det
 
 ---
 
+## toolkit_attributes
+
+Named, typed attribute channels bound to a geometry domain (point, vertex, edge, face, primitive, or global detail). This is the procedural-attribute backbone: instead of hard-coding vertex data layout, tools attach arbitrary named channels. The same machinery stores sculpt masks, paint weights, soft-selection falloff, per-element sim state, and extra UV sets.
+
+### Attribute
+One columnar channel of a single `AttributeType` (Float, Int32, Vec2, Vec3, Vec4, Color). Stores data as a typed `Vec`. Methods: `len()`, `get(n)`, `set(n, val)`, `push(val)`, `data_slice()`.
+
+### AttributeSet
+All channels for one domain, kept at the same length. `create(name, type)`, `get(name)`, `remove(name)`, `len()`, `resize(n)`.
+
+### AttributeStore
+One `AttributeSet` per domain (Point, Vertex, Edge, Face, Primitive, Detail). This is the bundle geometry carries. Methods: `create(domain, count, name, type)`, `get(domain, name)`, `resize_domain(domain, n)` — can infer count from other domains.
+
+---
+
+## toolkit_volume
+
+Dense 3D grids of scalars or vectors (`Volume<T>`), placed and sampled in world space. Each lattice point stores a `T` (any `VolumeSample`: f32, Vec2, Vec3, Vec4). This is the 3D counterpart to `toolkit_simulation::Grid2D`, used by voxel sculpting, 3D fluids/erosion, SDF/density fields, and volume baking.
+
+### Volume\<T\>
+`new(size: [usize; 3], origin: Vec3, cell_size: Vec3)` or `from_fn(size, origin, cell_size, f)`. Methods: `sample(point)`, `gradient(point)` (scalar only), `resample(new_size)`, `lerp(&other, t)`, `size()`, `origin()`, `cell_size()`, `world_to_grid()`, `grid_to_world()`, `data()`.
+
+### VolumeSample trait
+Implemented by `f32`, `Vec2`, `Vec3`, `Vec4`. Controls how interpolation and gradient operate on the cell type.
+
+---
+
+## toolkit_field
+
+A dependency-light `Field` trait mapping a point to a scalar and a `VectorField` mapping a point to `Vec3`, plus combinators that chain them without allocation. Closures implement `Field` for free, so any sampler (noise, SDF, volume, image) becomes a field with no wrapper.
+
+### Field trait (and VectorField)
+`fn sample(&self, p: Vec3) -> f32` / `fn sample(&self, p: Vec3) -> Vec3`. Implemented for closures and the built-in types.
+
+### FieldExt combinators
+Methods on any `Field`: `.add(other)`, `.mul(other)`, `.min(other)` / `.max(other)` (SDF union/intersection), `.clamp(lo, hi)`, `.remap(in_lo, in_hi, out_lo, out_hi)`, `.warp(field)`, `.translate(offset)`, `.scale(s)`. Chains without allocation.
+
+### Built-in fields
+`Constant(f32)`, `Sphere { center, radius }` (SDF sphere), `Plane { normal, d }` (SDF half-space). `gradient(field, p, eps)` numerically differentiates any field.
+
+---
+
+## toolkit_solver
+
+Sparse matrices and iterative linear solvers, dependency-free. Assemble a system as a `SparseMatrix` in triplet form, then solve it. Generalises the solver that previously lived inside `toolkit_uv` so fluids, deformers, and unwrapping all share it.
+
+### SparseMatrix
+Triplet (COO) format: `new(rows, cols)`, `push(row, col, value)`, `mul(vector)`, `mul_transpose(vector)`. Convertible to CSR for efficient iteration.
+
+### Solvers
+- `solve_cg(&matrix, &rhs, max_iters, tol)` — conjugate gradient for SPD systems (Laplacian smoothing, pressure projection)
+- `solve_least_squares(&matrix, &rhs, max_iters, tol)` — CGLS for any least-squares problem (UV unwrapping, gradient-domain)
+- `solve_gauss_seidel(&matrix, &rhs, max_iters, tol)` — relaxation
+- `solve_jacobi(&matrix, &rhs, max_iters, tol)` — relaxation
+
+---
+
 ## toolkit_scene
 
 3D scene graph: a forest of transform nodes stored in a generational arena.
@@ -226,7 +283,7 @@ UV unwrapping and atlas packing.
 `segment_charts(positions, triangles, seams)` → `Vec<Chart>` (connected patches between seam edges; local vertex remap). `Chart::unwrap()` flattens with LSCM. `unwrap_charts()` does both. `pack_charts(&mut charts, margin)` arranges islands into one `[0,1]²` space (shelf packer); `pack_sizes()` for raw bounding-box sizes. `AtlasPlacement` carries the per-chart `offset`/`scale`.
 
 ### solver
-`SparseMatrix` (triplet form, `mul`/`mul_transpose`) and `solve_least_squares` (conjugate-gradient least squares). Dependency-free.
+`SparseMatrix` (triplet form, `mul`/`mul_transpose`) and `solve_least_squares` (conjugate-gradient least squares). Dependency-free. *(Note: new projects should prefer `toolkit_solver` for solver needs — `toolkit_uv` keeps its embedded copy for backwards compatibility.)*
 
 ---
 
@@ -279,6 +336,245 @@ Metallic-roughness PBR (glTF workflow): `base_color`, `metallic`, `roughness`, `
 
 ### Navigation
 `FlyController` (first-person WASD + mouse-look: `look()`, `move_local()`, `apply_to()`, `from_camera()`). Framing: `frame_orbit()`, `frame_camera()`, `framing_distance()` focus the camera on a bounding sphere.
+
+---
+
+## toolkit_brush
+
+A geometry-agnostic brush engine: falloff profiles and stroke stamping. A `Brush` (radius, strength, `Falloff`, dab spacing) turns a dragged path into evenly spaced dabs and reports a stroke weight at any point. It never touches geometry itself — callers multiply the returned weights into whatever they edit: sculpting, mesh painting, terrain editing, and weight painting all share one engine.
+
+### Brush
+`new(radius, strength)` → `Brush`. Fields: `radius`, `strength`, `falloff` (Falloff enum), `spacing`. Methods: `dab_centers(&[path_points])` → dab positions along the path, `stroke_weight(&dabs, query_point)` → f32 weight for a point under the stroke.
+
+### Falloff
+Enum: `Constant`, `Linear`, `Smooth` (3x²−2x³, the default), `Smoother` (6x⁵−15x⁴+10x³), `Sphere` (√(1−x²)). Each maps a normalised distance-from-dab-center [0,1] to a weight.
+
+---
+
+## toolkit_select
+
+Weighted (soft) selection sets, element-kind agnostic. A `Selection` maps element indices to weights in [0,1]. Hard selections (all weights=1) and soft selections (falloff weights for proportional editing) use the same type. Complements `toolkit_topology::MeshSelection` (hard, mode-bound) by adding weights, boolean ops, grow/shrink, attribute thresholding, and distance falloff.
+
+### Selection
+`from_indices(indices)` / `from_weights(pairs)`. Methods: `contains(idx)`, `weight(idx)`, `count()`, `add(idx, weight)`, `remove(idx)`, `clear()`, `grow(&adjacency)` / `shrink(&adjacency)`, `union(&other)`, `intersect(&other)`, `threshold(weight)`, `select_by_attribute(&attrs, op, value)`.
+
+### Adjacency
+Build from edge pairs: `from_pairs(n_vertices, &[(u32, u32)])`. Query: `neighbors(vertex)` → slice of neighbor indices. Used by `Selection::grow`/`shrink`.
+
+---
+
+## toolkit_polyline
+
+Polyline operations shared by pen tools, paint strokes, contours, and curve editing — written once over a `Point` trait so they serve 2D and 3D alike.
+
+### Operations
+- `length(points)` → total arc length
+- `resample(points, n)` / `resample_by_spacing(points, spacing)` → even spacing along the curve
+- `smooth_chaikin(points, iterations)` → corner-cutting subdivision
+- `smooth_laplacian(points, iterations, lambda)` → relaxation smooth
+- `simplify(points, epsilon)` → Douglas-Peucker point reduction
+- `offset_2d(points, distance)` → sideways offset / outline of a 2D polyline
+
+### Point trait
+Implemented for `Vec2` and `Vec3`. Only `offset_2d` requires 2D; all other ops work on 3D polylines too.
+
+---
+
+## toolkit_meshedit
+
+Poly-modeling operators on polygon meshes — the bread and butter of "normal" (manual) modeling. Operations work on an `EditMesh` (positions + face loops) that round-trips through `toolkit_topology::HalfEdgeMesh`, so each operator is a small, robust face-list edit rather than fragile half-edge surgery.
+
+### EditMesh
+`from_halfedge(&HalfEdgeMesh)` / `to_mesh(name)` → round-trip. Methods:
+- `extrude_face(face_idx, distance)` / `extrude_faces(indices, distance)`
+- `inset_face(face_idx, amount)`
+- `bevel_face(face_idx, amount, segments)` — inset + extrude with segments
+- `bridge_faces(face_a, face_b)` — connect two open boundary caps
+- `dissolve_edge(edge_idx)` — merge two adjacent faces
+- `fill_hole(boundary_halfedge)` / `fill_all_holes()` — cap open boundaries
+- `loop_cut(edge_idx, param)` — insert an edge loop across a quad strip
+- `face_count()`, `vertex_count()`
+
+---
+
+## toolkit_triangulate
+
+2D polygon triangulation for procedural shapes, CAD profile faces, and filled text/vector outlines.
+
+### Functions
+- `triangulate(&polygon)` — ear-clips a simple polygon (handles concave and either winding)
+- `triangulate_with_holes(&outer, &holes)` — bridges holes into the outer loop, then clips; returns `Triangulation { vertices, triangles }`
+- `triangulate_delaunay(&polygon)` — ear-clip + constrained Lawson flip pass for Delaunay quality (fewer slivers)
+- `signed_area(&polygon)` — positive = CCW winding
+- `point_in_triangle(p, a, b, c)` — barycentric test
+
+---
+
+## toolkit_surfacing
+
+Generate meshes from 2D profiles and 3D paths — the CAD/procedural surfacing kit. All functions return a `toolkit_geometry::Mesh` with smooth normals.
+
+### Functions
+- `extrude(profile, depth, caps)` — sweep a closed 2D profile along +Z
+- `revolve(profile_points, segments)` — rotate a (radius, height) profile around Y
+- `loft(cross_sections)` — surface through a sequence of 3D cross-section loops
+- `sweep(profile, path, segments)` — extrude a 2D profile along a 3D path using rotation-minimizing frames
+
+### Helpers
+- `surface_from_grid(rows, cols, positions)` — build a mesh from a rectangular grid of Vec3s
+- `finish_mesh(positions, indices)` — compute normals and wrap in Mesh
+
+---
+
+## toolkit_voxelize
+
+Turn triangle meshes into volumes — the bridge from surfaces into `toolkit_volume` for remeshing, volume booleans, and simulations on arbitrary shapes.
+
+### Functions
+- `signed_distance_field(mesh, config)` → `Volume<f32>` — per-lattice unsigned distance to the nearest triangle, signed by ray-crossing parity inside test
+- `solid(mesh, config)` → `Volume<f32>` — threshold the SDF into binary occupancy (0=outside, 1=inside)
+- `surface_shell(mesh, config, shell_width)` → `Volume<f32>` — the thin band around the surface
+
+### VoxelizeConfig
+`resolution` (grid cells along the longest axis), `padding` (extra space around the mesh).
+
+---
+
+## toolkit_remesh
+
+Mesh simplification and remeshing.
+
+### Functions
+- `decimate_to(mesh, target_tris)` / `decimate_ratio(mesh, ratio)` — QEM (quadric error metric) edge collapse. Removes triangles while preserving shape. The standard LOD / sculpt-cleanup simplifier.
+- `cluster_remesh(mesh, cell_size)` — fast vertex clustering onto a uniform grid for unifying resolution and welding duplicate geometry.
+
+### Quadric
+The error metric type used by decimation. `Quadric::from_plane(normal, d)`, `Quadric::from_triangle(v0, v1, v2)`, `add`, `mul`, `evaluate(point)`.
+
+---
+
+## toolkit_meshops
+
+Mesh utility operations that don't need a half-edge structure — the cleanup/processing steps you reach for constantly after generating or importing geometry.
+
+### Functions
+- `weld_vertices(mesh, epsilon)` — merge coincident vertices (de-duplicate soup)
+- `recompute_normals(mesh)` / `recompute_tangents(mesh)` — regenerate shading attributes
+- `flip_winding(mesh)` — reverse triangle orientation
+- `merge(meshes)` — combine multiple meshes into one
+- `stats(mesh)` → `MeshStats` — vertex/triangle count, bounding box, surface area, genus
+- `laplacian_smooth(mesh, iterations, lambda)` — relax vertex positions
+- `decimate_grid(mesh, cell_size)` — simplify by vertex clustering *(note: prefers `toolkit_remesh::decimate_*` for quality)*
+
+---
+
+## toolkit_anim
+
+Keyframe animation. Build `Track`s of timed values (any `Animatable`: f32, Vec3, Quat), group them into a `TransformAnimation`, and advance an `AnimationPlayer` to drive `toolkit_scene` node transforms over time. Per-keyframe easing comes from `toolkit_easing`.
+
+### Track\<T\>
+`new()`, `add(time, value)`, `evaluate(time)` → interpolated value. Clamped to the keyframe range.
+
+### TransformAnimation
+Holds `translation: Track<Vec3>`, `rotation: Track<Quat>`, `scale: Track<Vec3>`. `sample(time)` → `Transform`. `apply_to_node(scene, node, time)` convenience method.
+
+### AnimationPlayer
+`new(duration)`, `update(dt)`, `play()`, `pause()`, `stop()`, `seek(time)`. `time` field for sampling. `finished()` when the end is reached.
+
+### Re-exports
+`toolkit_easing::Easing` — each keyframe can use a different easing curve.
+
+---
+
+## toolkit_curves
+
+Parametric curves and surfaces — the foundation for CAD-style modeling. Curves tessellate to polylines; surfaces tessellate to a `toolkit_geometry::Mesh`.
+
+### Curves
+- `Bezier` — arbitrary-degree Bézier (de Casteljau). `new(control_points)`, `evaluate(t)`, `tessellate(segments)`, `split(t)`, `derivative(t)`
+- `BSplineCurve` — B-spline with clamped/uniform or custom knots (De Boor). `new(points, degree)`, `evaluate(t)`, `tessellate(segments)`, `derivative(t)`
+- `NurbsCurve` — rational B-spline (weights for circles/conics). Same API + `weights`
+- `CatmullRom` — interpolating spline through waypoints. `new(points, alpha)`, `evaluate(t)`, `tessellate(segments)`
+
+### Surfaces
+- `NurbsSurface` — rational B-spline surface. `evaluate(u, v)`, `tessellate(u_segments, v_segments)` → Mesh
+
+### Utilities
+`clamped_uniform_knots(n, degree)`, `find_span(knots, degree, t)` (De Boor knot search), `domain(knots, degree)`.
+
+---
+
+## toolkit_easing
+
+Easing, interpolation, and tweening — pure-math and dependency-light. Used by `toolkit_anim` but useful independently for UI transitions, camera animations, and any interpolated motion.
+
+### Easing enum
+`Linear`, `QuadIn`/`QuadOut`/`QuadInOut`, `CubicIn`/`CubicOut`/`CubicInOut`, `SineIn`/`SineOut`/`SineInOut`, `ElasticIn`/`ElasticOut`/`ElasticInOut`, `BounceOut`, `Spring( stiffness, damping )`. `ease(t)` returns the eased 0..1.
+
+### Functions
+- `ease(t, Easing)` → eased 0..1
+- `lerp(a, b, t)` / `inverse_lerp(a, b, value)` / `remap(value, in_lo, in_hi, out_lo, out_hi)` — scalar helpers
+- `Tween::new(duration, easing)` — time-driven, yields progress via `update(dt)`. `Repeat::Once`/`Repeat::Loop`/`Repeat::PingPong`.
+
+---
+
+## toolkit_noise
+
+Coherent noise functions for procedural content. All noise is seeded and deterministic — same seed = same output across platforms.
+
+### Noise
+`new(seed)` → deterministic Perlin/simplex/value noise. Methods: `noise2(x, y)`, `noise3(x, y, z)`, `simplex2(x, y)`, `simplex3(x, y, z)`, `value2(x, y)`, `value3(x, y, z)`.
+
+### Fbm / NoiseKind
+`Fbm::new(kind)` layers a base noise into fractal detail. Methods: `sample2(&noise, x, y)` / `sample3(&noise, x, y, z)`. Config: `octaves`, `lacunarity`, `persistence`, `ridged` (boolean — creates mountain-like terrain). `NoiseKind::{Perlin, Simplex, Value}`.
+
+### Worley
+`worley2(x, y)`, `worley2_f2(x, y)`, `worley3(x, y, z)` — cellular (Voronoi) noise. Returns distance to nearest feature point. `_f2` = difference between nearest and second-nearest (bubble/vein patterns).
+
+---
+
+## toolkit_rng
+
+Deterministic seeded random numbers. PCG32 generator: small, fast, reproducible across platforms for a given seed — the property procedural generation depends on.
+
+### Rng
+`seed_from_u64(seed)` / `from_u64_pair(seed, stream)`. Methods: `next_u32()`, `next_f32()`, `next_f64()`, `range_f32(lo, hi)`, `range_i32(lo, hi)`, `shuffle(slice)`, `pick(&[T])`.
+
+### Geometric sampling
+`unit_vec3()`, `unit_vec2()`, `inside_sphere()`, `inside_disk()`, `hemisphere(normal)`, `on_sphere()`, `on_disk()`.
+
+### Poisson-disk
+`poisson_disk_2d(width, height, radius, rng, max_attempts)` → `Vec<Vec2>` blue-noise point set. Uses the standard O(N) dart-throwing algorithm with a background grid.
+
+---
+
+## toolkit_sdf
+
+Signed distance fields (SDF): implicit modeling with smooth booleans. Build a shape as an `Sdf` tree of primitives and CSG combinators, then `polygonize` it into a `toolkit_geometry::Mesh` with surface nets.
+
+### Primitives
+`Sphere { radius }`, `BoxSdf { half_extents }`, `Cylinder { radius, height }`, `Capsule { a, b, radius }`, `Plane { normal, d }`, `Torus { major, minor }`. Free functions: `sd_sphere`, `sd_box`, `sd_capsule`, `sd_cylinder`, `sd_plane`, `sd_round_box`, `sd_torus`, `sdf_normal(p, sdf)`.
+
+### CSG combinators
+`union(a, b)`, `intersection(a, b)`, `subtraction(a, b)`, `smooth_union(a, b, k)`, `smooth_intersection(a, b, k)`, `smooth_subtraction(a, b, k)`. Transform combinators: `translate(sdf, offset)`, `scale(sdf, factor)`. The `Sdf` trait gives all combinators as methods.
+
+### Polygonize
+`polygonize(sdf, &bounds, resolution)` → `Mesh`. Uses surface nets (dual contouring variant) for non-manifold-capable meshing.
+
+---
+
+## toolkit_spatial
+
+Spatial acceleration structures for neighbour and range queries.
+
+### SpatialHashGrid
+Dynamic — insert/clear per frame. Best when points move and queries use a consistent radius (particles, broad-phase). `new(cell_size)`, `insert(id, pos)`, `query(pos, radius)` → neighbor ids, `clear()`.
+
+### KdTree
+Static — build once. Best for nearest-neighbour and radius queries over a fixed set (point clouds, sampling). `build(&[Vec3])`, `nearest(point)` → `Option<usize>`, `k_nearest(point, k)` → `Vec<(usize, f32)>`, `radius(point, radius)` → `Vec<(usize, f32)>`.
+
+### Octree
+Hierarchical box/range queries over uneven distributions. `new(bounds, max_depth, max_elements)`, `insert(aabb, id)`, `query(&aabb)` → ids, `remove(id)`.
 
 ---
 
