@@ -34,7 +34,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
   inset, bevel, bridge, loop-cut, dissolve, fill-hole. Normal modeling.
 - [x] **toolkit_select** — unified typed selection sets (point/edge/face) with
   boolean ops, grow/shrink, by-attribute, and **soft selection** (falloff weights).
-- [ ] **toolkit_polyline** — 2D/3D polyline ops: resample by arc length, smooth
+- [x] **toolkit_polyline** — 2D/3D polyline ops: resample by arc length, smooth
   (Chaikin/Laplacian), simplify (Douglas-Peucker), offset, length.
 
 ## Tier C — Geometry generation / processing

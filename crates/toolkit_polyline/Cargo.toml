@@ -1,0 +1,13 @@
+[package]
+name = "toolkit_polyline"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Polyline operations: arc-length resampling, smoothing, simplification, and 2D offsetting"
+
+[dependencies]
+glam = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
