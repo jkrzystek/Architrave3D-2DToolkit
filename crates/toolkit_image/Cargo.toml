@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_image"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "CPU RGBA8 image buffer with blit, resize, sampling, and PNG read/write"
+
+[dependencies]
+toolkit_core = { workspace = true }
+png = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
