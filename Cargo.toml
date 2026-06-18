@@ -26,6 +26,7 @@ members = [
     "crates/toolkit_anim",
     "crates/toolkit_units",
     "crates/toolkit_color",
+    "crates/toolkit_intersect",
 ]
 
 [workspace.package]

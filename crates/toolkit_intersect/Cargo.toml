@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_intersect"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Closest-point and intersection tests (segment, sphere, plane, capsule) plus frustum culling"
+
+[dependencies]
+toolkit_geometry = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

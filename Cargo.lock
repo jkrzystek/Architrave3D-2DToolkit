@@ -1456,6 +1456,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_intersect"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_geometry",
+]
+
+[[package]]
 name = "toolkit_meshops"
 version = "0.1.0"
 dependencies = [
