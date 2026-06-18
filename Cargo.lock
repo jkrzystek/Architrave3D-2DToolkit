@@ -1610,6 +1610,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_select"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_brush",
+]
+
+[[package]]
 name = "toolkit_simulation"
 version = "0.1.0"
 dependencies = [

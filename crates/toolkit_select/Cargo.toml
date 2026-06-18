@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_select"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Weighted (soft) selection sets with boolean ops, grow/shrink, thresholding, and distance falloff"
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+toolkit_brush = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

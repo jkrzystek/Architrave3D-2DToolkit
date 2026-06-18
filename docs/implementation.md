@@ -32,7 +32,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
   Shared by sculpt / mesh paint / terrain / weight paint.
 - [x] **toolkit_meshedit** — poly-modeling ops on the half-edge mesh: extrude,
   inset, bevel, bridge, loop-cut, dissolve, fill-hole. Normal modeling.
-- [ ] **toolkit_select** — unified typed selection sets (point/edge/face) with
+- [x] **toolkit_select** — unified typed selection sets (point/edge/face) with
   boolean ops, grow/shrink, by-attribute, and **soft selection** (falloff weights).
 - [ ] **toolkit_polyline** — 2D/3D polyline ops: resample by arc length, smooth
   (Chaikin/Laplacian), simplify (Douglas-Peucker), offset, length.
