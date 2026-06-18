@@ -279,3 +279,33 @@ Metallic-roughness PBR (glTF workflow): `base_color`, `metallic`, `roughness`, `
 
 ### Navigation
 `FlyController` (first-person WASD + mouse-look: `look()`, `move_local()`, `apply_to()`, `from_camera()`). Framing: `frame_orbit()`, `frame_camera()`, `framing_distance()` focus the camera on a bounding sphere.
+
+---
+
+## toolkit_units
+
+Length unit system for CAD precision. `Length` stores metres canonically so arithmetic (`Add`/`Sub`/`Mul<f64>`/`Div`) is unit-agnostic; convert at the edges with `Length::new(value, unit)` / `in_unit()` / `format()`. `LengthUnit` (mm/cm/m/km/in/ft/yd/mi) knows its `meters_per_unit()` and `abbreviation()`. `UnitSystem { display, precision }` formats and `parse()`s user input (`"25.4 mm"`, `"3ft"`, or a bare number in the display unit), with `metric()` / `imperial()` presets.
+
+---
+
+## toolkit_color
+
+Colour spaces over `toolkit_core::LinearRgba`. `Hsv` (hue rotation, picker-friendly) and `Oklab` (perceptually uniform, natural mixing) both round-trip via `from_linear()`/`to_linear()`. `Gradient` holds sorted `ColorStop`s, samples in `InterpolationSpace::{LinearRgb, Oklab}` via `sample(t)`, and emits a `ramp(count)`. `Palette` is a named colour set with `get_wrapping()` and `distinct_hues(count, sat, val)` for category colours.
+
+---
+
+## toolkit_intersect
+
+Bounding-shape queries extending geometry's ray-only set. Shapes: `Plane` (`signed_distance`), `Sphere`, `Segment`, `Capsule`. Closest-point: `closest_point_on_segment/_aabb/_plane`, `closest_points_between_segments`. Overlap booleans: `sphere_sphere`, `sphere_aabb`, `sphere_plane`, `segment_sphere`(`_gap`), `capsule_capsule`, `aabb_plane_side`. `Frustum::from_view_projection()` (Gribb–Hartmann, `[0,1]` clip depth) with `intersects_sphere`/`intersects_aabb` (positive-vertex cull) and `contains_sphere`.
+
+---
+
+## toolkit_image
+
+CPU RGBA8 image buffer for texture work and baking. `Image` stores packed sRGB bytes: `pixel`/`set_pixel`, `linear_at`/`set_linear` (via `LinearRgba`), `fill`. `sample_bilinear(u, v)` and `resize(w, h)` filter in linear space; `blit(src, ox, oy)` clips to bounds. PNG I/O: `encode_png`/`decode_png` (decode normalises palette/grayscale/16-bit/RGB → RGBA8) and `load_png`/`save_png`. Backed by the `png` crate.
+
+---
+
+## toolkit_project
+
+The "open / save my work" bundle. `Project` holds a `Scene` plus the assets its nodes reference — meshes (UVs ride along in their vertices), PBR `materials`, and embedded `textures` — stored as `(id, value)` lists so they serialize to both JSON and binary. `add_mesh`/`add_material`/`add_texture` allocate ids; `insert_*` upserts by id; `mesh`/`material`/`texture` look up. `to_json`/`to_binary` (+ `save_*`/`load_*` files) round-trip the whole bundle; `validate()` reports dangling asset references. `ProjectMetadata` carries name, `UnitSystem`, and generator string.
