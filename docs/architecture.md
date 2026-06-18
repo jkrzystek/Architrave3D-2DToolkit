@@ -245,3 +245,132 @@ Advanced:
 
 Each crate depends only on `toolkit_core` plus specific domain crates — nothing
 else. This keeps compilation incremental and lets you pull in only what you need.
+
+---
+
+## Know Weaknesses & Future-Proofing
+
+This list is here so future-you (or contributors) know what to watch for.
+None of these are blockers — they're risks that grow with the toolkit.
+
+### 1. No semver policy → dependency breaks silently
+
+Today every crate has `version.workspace = true`. When you update the toolkit
+mid-project, there's no version bump telling you something changed. If you
+refactor `toolkit_topology::HalfEdgeMesh`, projects using `toolkit_meshedit`
+compile-fail with no warning.
+
+**Fix later:** Add a `CHANGELOG.md` per crate or a workspace-level changelog.
+Start versioning independently once the APIs stabilise (1.0).
+
+### 2. `toolkit_core` is an accretion risk
+
+Everything depends on `toolkit_core`. Right now it's small (IDs, events,
+commands, TileMap, LinearRgba). If every new module puts shared types there,
+it grows into a 5000-line monolith that every compilation rebuilds.
+
+**Fix later:** Split off independent clusters:
+- `toolkit_ids` (define_id! macro + atomic counter)
+- `toolkit_color` stays separate (it already is)
+- `toolkit_commands` (DocumentCommand, RenderCommand dispatcher)
+
+### 3. No serialisation versioning → old files may not load
+
+Types derive `Serialize`/`Deserialize`, but there's no schema version or
+migration pass. A `Project` saved today with `toolkit_project` might not
+deserialise after a struct field rename.
+
+**Fix later:** Add a `version: u32` field to `ProjectMetadata`. Write a
+`migrate_v1_to_v2()` function. Tag `#[serde(deny_unknown_fields)]` to
+catch stale files early.
+
+### 4. Heavy deps pulled even when unused
+
+`toolkit_render` depends on `wgpu`. If your headless mesh processor only
+needs `Camera::math` for ray generation, you still compile wgpu. Same
+for `toolkit_ui` (egui).
+
+**Fix later:** Split render into:
+- `toolkit_render_core` — Camera, math, uniforms (tiny, no GPU dep)
+- `toolkit_render_wgpu` — GpuContext, pipelines, TextureCache
+
+Or use feature flags to make wgpu/egui optional.
+
+### 5. No doc-test CI → docs drift from reality
+
+Every code snippet in `module-reference.md` and `building-apps.md` is hand-
+written. If a module's API changes, the doc snippet silently becomes wrong.
+There's no CI step that runs `cargo test --doc` across the workspace.
+
+**Fix later:** Add a CI workflow:
+```yaml
+# .github/workflows/ci.yml
+- run: cargo test --workspace --doc
+```
+Or run it manually before committing:
+```bash
+cargo test --workspace --doc 2>&1 | grep "FAILED"
+```
+
+### 6. No benchmark suite → optimisations are guesswork
+
+When you port an app optimisation back into a toolkit module ("I found a faster
+way to compute this"), there's no baseline to compare against. You can't tell
+if the change made things faster or slower.
+
+**Fix later:** Add a `benches/` dir to crates with hot loops:
+- `toolkit_geometry` — BVH build + intersect throughput
+- `toolkit_solver` — CG convergence rate for known matrices
+- `toolkit_remesh` — decimation throughput
+- `toolkit_voxelize` — SDF generation time
+
+### 7. No integration tests across crate boundaries
+
+Each crate tests itself (`#[cfg(test)] mod tests` per file). But there's no
+test that chains `geometry → topology → uv → texture_bake` and checks the
+output matches an expected hash. Cross-crate integration bugs only show up
+when you build an app.
+
+**Fix later:** Add an `tests/` directory at workspace root with integration
+tests that exercise common pipelines:
+```rust
+// tests/pipeline_uv_bake.rs
+use toolkit_geometry::Mesh;
+use toolkit_topology::HalfEdgeMesh;
+use toolkit_uv::unwrap_charts;
+// ... assert output is reasonable
+```
+
+### 8. Module granularity needs periodic review
+
+Some crates are tiny (e.g. `toolkit_easing` is ~200 lines, `toolkit_select`
+is ~300 lines). That's fine for separation of concerns — but if you end up
+with 80 small crates, `cargo build` overhead (resolution, metadata) grows.
+
+**Fix later:** If crate count exceeds ~70, merge closely related crates
+behind feature flags:
+- `toolkit_proc = { features = ["noise", "rng", "sdf", "wfc"] }`
+- `toolkit_modeling = { features = ["meshedit", "select", "polyline"] }`
+
+### 9. No `toolkit-prelude` for common imports
+
+Every app file starts with a wall of `use` statements:
+```rust
+use toolkit_core::*;
+use toolkit_geometry::*;
+use toolkit_topology::*;
+use toolkit_scene::*;
+```
+
+**Fix later:** Add a `toolkit_prelude` crate that re-exports the most common
+types from every module. Apps add one import:
+```rust
+use toolkit_prelude::*;
+```
+
+### Summary
+
+The toolkit is **well-designed for the growing-reusable-library model**. The
+risks above are maturity risks, not design flaws — they're what happens when
+a library is used by one person across multiple apps without formal release
+management. Most are cheap to fix when the time comes.
