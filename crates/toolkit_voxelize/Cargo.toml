@@ -1,0 +1,16 @@
+[package]
+name = "toolkit_voxelize"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Convert meshes into signed-distance / solid / surface volumes"
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_volume = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

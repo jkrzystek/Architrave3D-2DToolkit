@@ -1773,6 +1773,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_voxelize"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_geometry",
+ "toolkit_volume",
+]
+
+[[package]]
 name = "toolkit_wfc"
 version = "0.1.0"
 dependencies = [

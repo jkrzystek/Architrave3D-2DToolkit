@@ -43,7 +43,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
   holes + constrained Delaunay). 2D procedural shapes, CAD profile faces.
 - [x] **toolkit_surfacing** — surface generation from profiles: extrude, loft,
   revolve, sweep-along-curve. CAD + procedural.
-- [ ] **toolkit_voxelize** — mesh -> volume (surface + solid / winding-number
+- [x] **toolkit_voxelize** — mesh -> volume (surface + solid / winding-number
   inside test). Bridges meshes into toolkit_volume for remesh, sims, booleans.
 - [ ] **toolkit_remesh** — isotropic remesh + QEM decimation (the deferred QEM).
   Dynamic sculpt topology + cleanup.
