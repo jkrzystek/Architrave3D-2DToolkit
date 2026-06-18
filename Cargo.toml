@@ -24,6 +24,7 @@ members = [
     "crates/toolkit_spatial",
     "crates/toolkit_sdf",
     "crates/toolkit_anim",
+    "crates/toolkit_units",
 ]
 
 [workspace.package]
@@ -94,3 +95,8 @@ toolkit_meshops = { path = "crates/toolkit_meshops" }
 toolkit_spatial = { path = "crates/toolkit_spatial" }
 toolkit_sdf = { path = "crates/toolkit_sdf" }
 toolkit_anim = { path = "crates/toolkit_anim" }
+toolkit_units = { path = "crates/toolkit_units" }
+toolkit_color = { path = "crates/toolkit_color" }
+toolkit_intersect = { path = "crates/toolkit_intersect" }
+toolkit_image = { path = "crates/toolkit_image" }
+toolkit_project = { path = "crates/toolkit_project" }
