@@ -21,7 +21,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 - [x] **toolkit_field** — tiny `Field` trait (sample scalar/vector at a point) +
   combinators (add/mul/min/max/warp/clamp/remap). Unifies noise/sdf/volume/image
   as composable fields.
-- [ ] **toolkit_solver** — sparse matrix + iterative solvers (CG, Gauss-Seidel,
+- [x] **toolkit_solver** — sparse matrix + iterative solvers (CG, Gauss-Seidel,
   Jacobi). Generalizes the CGLS embedded in toolkit_uv. Pressure projection,
   Laplacian deformation/smoothing, cloth, UV.
 

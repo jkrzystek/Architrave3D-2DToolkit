@@ -1612,6 +1612,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_solver"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "toolkit_spatial"
 version = "0.1.0"
 dependencies = [

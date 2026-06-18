@@ -1,0 +1,13 @@
+[package]
+name = "toolkit_solver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Sparse matrices and iterative linear solvers (CGLS, CG, Jacobi, Gauss-Seidel)"
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
