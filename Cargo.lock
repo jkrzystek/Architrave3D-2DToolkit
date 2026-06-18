@@ -1381,6 +1381,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_convex"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_geometry",
+]
+
+[[package]]
 name = "toolkit_core"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_convex"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "3D convex hull (incremental) and GJK distance between convex point sets"
+
+[dependencies]
+toolkit_geometry = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
