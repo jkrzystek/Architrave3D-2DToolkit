@@ -1575,6 +1575,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_remesh"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde_json",
+ "toolkit_geometry",
+]
+
+[[package]]
 name = "toolkit_render"
 version = "0.1.0"
 dependencies = [

@@ -45,7 +45,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
   revolve, sweep-along-curve. CAD + procedural.
 - [x] **toolkit_voxelize** — mesh -> volume (surface + solid / winding-number
   inside test). Bridges meshes into toolkit_volume for remesh, sims, booleans.
-- [ ] **toolkit_remesh** — isotropic remesh + QEM decimation (the deferred QEM).
+- [x] **toolkit_remesh** — isotropic remesh + QEM decimation (the deferred QEM).
   Dynamic sculpt topology + cleanup.
 - [ ] **toolkit_marching** — higher-quality isosurfacing (marching cubes + dual
   contouring with sharp features) over Field/Volume.

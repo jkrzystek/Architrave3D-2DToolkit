@@ -1,0 +1,14 @@
+[package]
+name = "toolkit_remesh"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Mesh simplification (QEM edge-collapse decimation) and vertex-cluster remeshing"
+
+[dependencies]
+glam = { workspace = true }
+toolkit_geometry = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
