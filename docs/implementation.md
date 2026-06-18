@@ -27,7 +27,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 
 ## Tier B — Interaction & editing operators
 
-- [ ] **toolkit_brush** — stroke + falloff engine: profile curves, radius/
+- [x] **toolkit_brush** — stroke + falloff engine: profile curves, radius/
   strength/spacing/pressure, stroke sampling along a path, apply-kernel-in-radius.
   Shared by sculpt / mesh paint / terrain / weight paint.
 - [ ] **toolkit_meshedit** — poly-modeling ops on the half-edge mesh: extrude,

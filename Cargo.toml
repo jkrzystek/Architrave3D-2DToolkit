@@ -39,6 +39,7 @@ members = [
     "crates/toolkit_volume",
     "crates/toolkit_field",
     "crates/toolkit_solver",
+    "crates/toolkit_brush",
 ]
 
 [workspace.package]
@@ -127,3 +128,4 @@ toolkit_attributes = { path = "crates/toolkit_attributes" }
 toolkit_volume = { path = "crates/toolkit_volume" }
 toolkit_field = { path = "crates/toolkit_field" }
 toolkit_solver = { path = "crates/toolkit_solver" }
+toolkit_brush = { path = "crates/toolkit_brush" }
