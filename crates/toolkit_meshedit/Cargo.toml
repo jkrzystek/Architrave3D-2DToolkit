@@ -1,0 +1,16 @@
+[package]
+name = "toolkit_meshedit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Poly-modeling operators (extrude, inset, bevel, bridge, dissolve, fill-hole, loop-cut) on polygon meshes"
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_topology = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

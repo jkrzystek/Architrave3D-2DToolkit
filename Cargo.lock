@@ -1523,6 +1523,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_meshedit"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_geometry",
+ "toolkit_topology",
+]
+
+[[package]]
 name = "toolkit_meshops"
 version = "0.1.0"
 dependencies = [

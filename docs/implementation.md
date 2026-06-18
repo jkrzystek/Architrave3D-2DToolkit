@@ -30,7 +30,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 - [x] **toolkit_brush** — stroke + falloff engine: profile curves, radius/
   strength/spacing/pressure, stroke sampling along a path, apply-kernel-in-radius.
   Shared by sculpt / mesh paint / terrain / weight paint.
-- [ ] **toolkit_meshedit** — poly-modeling ops on the half-edge mesh: extrude,
+- [x] **toolkit_meshedit** — poly-modeling ops on the half-edge mesh: extrude,
   inset, bevel, bridge, loop-cut, dissolve, fill-hole. Normal modeling.
 - [ ] **toolkit_select** — unified typed selection sets (point/edge/face) with
   boolean ops, grow/shrink, by-attribute, and **soft selection** (falloff weights).
