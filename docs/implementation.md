@@ -18,7 +18,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 - [x] **toolkit_volume** — dense 3D scalar/vector grid `Volume<T>` with trilinear
   sampling, gradient, resample, world transform. 3D fluids, voxel sculpt, 3D
   erosion, SDF baking, density fields.
-- [ ] **toolkit_field** — tiny `Field` trait (sample scalar/vector at a point) +
+- [x] **toolkit_field** — tiny `Field` trait (sample scalar/vector at a point) +
   combinators (add/mul/min/max/warp/clamp/remap). Unifies noise/sdf/volume/image
   as composable fields.
 - [ ] **toolkit_solver** — sparse matrix + iterative solvers (CG, Gauss-Seidel,

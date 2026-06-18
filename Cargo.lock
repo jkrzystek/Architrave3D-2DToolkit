@@ -1431,6 +1431,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_field"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "toolkit_geometry"
 version = "0.1.0"
 dependencies = [
