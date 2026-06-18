@@ -1,0 +1,18 @@
+[package]
+name = "toolkit_texture_bake"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Rasterize UV charts into a texture-space geometry buffer and bake normal/position/AO maps"
+
+[dependencies]
+toolkit_core = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_image = { workspace = true }
+toolkit_rng = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

@@ -1596,6 +1596,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_texture_bake"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde",
+ "serde_json",
+ "toolkit_core",
+ "toolkit_geometry",
+ "toolkit_image",
+ "toolkit_rng",
+]
+
+[[package]]
 name = "toolkit_topology"
 version = "0.1.0"
 dependencies = [

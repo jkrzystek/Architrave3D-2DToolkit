@@ -30,6 +30,7 @@ members = [
     "crates/toolkit_image",
     "crates/toolkit_project",
     "crates/toolkit_skeleton",
+    "crates/toolkit_texture_bake",
 ]
 
 [workspace.package]
