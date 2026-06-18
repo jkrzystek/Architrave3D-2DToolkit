@@ -1680,6 +1680,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "toolkit_surfacing"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "serde_json",
+ "toolkit_geometry",
+ "toolkit_triangulate",
+]
+
+[[package]]
 name = "toolkit_text"
 version = "0.1.0"
 dependencies = [

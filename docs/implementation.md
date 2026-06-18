@@ -41,7 +41,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done (committed)
 
 - [x] **toolkit_triangulate** — robust 2D polygon triangulation (ear clipping with
   holes + constrained Delaunay). 2D procedural shapes, CAD profile faces.
-- [ ] **toolkit_surfacing** — surface generation from profiles: extrude, loft,
+- [x] **toolkit_surfacing** — surface generation from profiles: extrude, loft,
   revolve, sweep-along-curve. CAD + procedural.
 - [ ] **toolkit_voxelize** — mesh -> volume (surface + solid / winding-number
   inside test). Bridges meshes into toolkit_volume for remesh, sims, booleans.
