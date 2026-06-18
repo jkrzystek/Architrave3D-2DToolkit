@@ -1,0 +1,15 @@
+[package]
+name = "toolkit_text"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Signed-distance-field glyph generation, atlas packing, and text layout"
+
+[dependencies]
+toolkit_image = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

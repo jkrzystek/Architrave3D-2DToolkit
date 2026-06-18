@@ -32,6 +32,9 @@ members = [
     "crates/toolkit_skeleton",
     "crates/toolkit_texture_bake",
     "crates/toolkit_convex",
+    "crates/toolkit_text",
+    "crates/toolkit_lsystem",
+    "crates/toolkit_wfc",
 ]
 
 [workspace.package]

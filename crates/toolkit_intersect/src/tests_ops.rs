@@ -1,7 +1,6 @@
 //! Boolean overlap tests between bounding shapes. Most reduce to a
 //! closest-point distance compared against a radius.
 
-use glam::Vec3;
 use toolkit_geometry::Aabb;
 
 use crate::closest::{
@@ -68,6 +67,7 @@ pub fn aabb_plane_side(aabb: &Aabb, plane: &Plane) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use glam::Vec3;
 
     #[test]
     fn spheres_overlap_and_not() {
