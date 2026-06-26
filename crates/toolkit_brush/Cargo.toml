@@ -9,6 +9,8 @@ description = "Brush falloff and stroke-stamping engine shared by sculpting, mes
 [dependencies]
 glam = { workspace = true }
 serde = { workspace = true }
+toolkit_geometry = { workspace = true }
+toolkit_image = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

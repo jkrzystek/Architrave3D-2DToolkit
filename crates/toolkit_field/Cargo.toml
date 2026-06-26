@@ -9,6 +9,7 @@ description = "A thin sample-at-point Field trait with composable combinators (t
 [dependencies]
 glam = { workspace = true }
 serde = { workspace = true }
+toolkit_geometry = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

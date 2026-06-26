@@ -19,7 +19,9 @@
 //! ```
 
 pub mod combinators;
+pub mod cross_field;
 pub mod field;
 
 pub use combinators::FieldExt;
+pub use cross_field::{compute_odeco_cross_field, OdecoCrossField};
 pub use field::{gradient, Constant, Field, Sphere, VectorField};

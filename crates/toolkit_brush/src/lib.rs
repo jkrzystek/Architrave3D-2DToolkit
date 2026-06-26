@@ -21,6 +21,8 @@
 
 pub mod brush;
 pub mod falloff;
+pub mod splat;
 
 pub use brush::Brush;
 pub use falloff::Falloff;
+pub use splat::{splat_stroke_seamless, rnm_blend, SplatTarget};

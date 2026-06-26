@@ -21,5 +21,5 @@
 pub mod bake;
 pub mod rasterize;
 
-pub use bake::{bake_ambient_occlusion, bake_object_normal_map, bake_position_map};
+pub use bake::{bake_ambient_occlusion, bake_curvature_map, bake_object_normal_map, bake_position_map};
 pub use rasterize::{rasterize_gbuffer, GBuffer, GeometrySample};

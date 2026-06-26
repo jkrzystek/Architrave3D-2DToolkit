@@ -32,6 +32,103 @@ pub fn bake_object_normal_map(gb: &GBuffer) -> Image {
     img
 }
 
+/// Bake a **curvature map**: grayscale image where bright = high curvature.
+/// Uses per-triangle discrete curvature estimated from normal variation.
+/// Uncovered texels are mid-gray (`128`).
+pub fn bake_curvature_map(mesh: &Mesh, gb: &GBuffer) -> Image {
+    // Precompute per-triangle curvature magnitude.
+    let tri_curvature: Vec<f32> = (0..mesh.triangle_count())
+        .map(|tri_idx| triangle_curvature_magnitude(mesh, tri_idx))
+        .collect();
+
+    let mut max_curv = 1e-6_f32;
+    for &c in &tri_curvature {
+        if c > max_curv {
+            max_curv = c;
+        }
+    }
+
+    let mut img = Image::new(gb.width(), gb.height());
+    for y in 0..gb.height() {
+        for x in 0..gb.width() {
+            let px = match gb.at(x, y) {
+                Some(s) => {
+                    let c = tri_curvature.get(s.triangle as usize).copied().unwrap_or(0.0);
+                    let t = (c / max_curv).min(1.0);
+                    let v = (t * 255.0) as u8;
+                    [v, v, v, 255]
+                }
+                None => [128, 128, 128, 255],
+            };
+            img.set_pixel(x, y, px);
+        }
+    }
+    img
+}
+
+fn triangle_curvature_magnitude(mesh: &Mesh, tri_idx: usize) -> f32 {
+    let base = tri_idx * 3;
+    let i0 = mesh.indices[base] as usize;
+    let i1 = mesh.indices[base + 1] as usize;
+    let i2 = mesh.indices[base + 2] as usize;
+    let p0 = mesh.vertices[i0].position_vec3();
+    let p1 = mesh.vertices[i1].position_vec3();
+    let p2 = mesh.vertices[i2].position_vec3();
+    let n0 = mesh.vertices[i0].normal_vec3();
+    let n1 = mesh.vertices[i1].normal_vec3();
+    let n2 = mesh.vertices[i2].normal_vec3();
+
+    let normal = ((n0 + n1 + n2) / 3.0).normalize_or_zero();
+    if normal.length_squared() < 1e-6 {
+        return 0.0;
+    }
+
+    let e1 = (p1 - p0).normalize_or_zero();
+    let e2 = normal.cross(e1).normalize_or_zero();
+    let e1 = e2.cross(normal).normalize_or_zero();
+
+    let mut sxx = 0.0_f32;
+    let mut syy = 0.0_f32;
+    let mut sxy = 0.0_f32;
+    let mut w_sum = 0.0_f32;
+
+    for &(a, b) in &[(i0, i1), (i1, i2), (i2, i0)] {
+        let pa = mesh.vertices[a].position_vec3();
+        let pb = mesh.vertices[b].position_vec3();
+        let na = mesh.vertices[a].normal_vec3();
+        let nb = mesh.vertices[b].normal_vec3();
+
+        let dp = pb - pa;
+        let du = dp.dot(e1);
+        let dv = dp.dot(e2);
+        let dn = nb - na;
+        let dnu = -dn.dot(e1);
+        let dnv = -dn.dot(e2);
+
+        let len2 = du * du + dv * dv;
+        if len2 > 1e-12 {
+            let w = 1.0 / len2.sqrt();
+            sxx += w * dnu * du;
+            syy += w * dnv * dv;
+            sxy += w * 0.5 * (dnu * dv + dnv * du);
+            w_sum += w;
+        }
+    }
+
+    if w_sum > 0.0 {
+        sxx /= w_sum;
+        syy /= w_sum;
+        sxy /= w_sum;
+    }
+
+    let trace = sxx + syy;
+    let det = sxx * syy - sxy * sxy;
+    let disc = (trace * trace * 0.25 - det).max(0.0).sqrt();
+    let lambda1 = (trace * 0.5 + disc).abs();
+    let lambda2 = (trace * 0.5 - disc).abs();
+    lambda1 + lambda2
+}
+
 /// Bake a **position map**: model-space position remapped from `bounds` into
 /// `[0, 1]` per channel. Uncovered texels are black.
 pub fn bake_position_map(gb: &GBuffer, bounds: &Aabb) -> Image {

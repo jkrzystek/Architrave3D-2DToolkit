@@ -18,7 +18,9 @@
 pub mod grid;
 pub mod kdtree;
 pub mod octree;
+pub mod poisson;
 
 pub use grid::SpatialHashGrid;
 pub use kdtree::KdTree;
 pub use octree::Octree;
+pub use poisson::{poisson_disk_surface_sample, SurfaceSample};
