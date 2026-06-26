@@ -1,6 +1,8 @@
 use toolkit_core::{ToolkitError, ToolkitResult};
 
 pub struct GpuContext {
+    pub instance: wgpu::Instance,
+    pub adapter: wgpu::Adapter,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub adapter_info: wgpu::AdapterInfo,
@@ -59,6 +61,8 @@ impl GpuContext {
             .map_err(|e| ToolkitError::GpuError(format!("Device request failed: {e}")))?;
 
         Ok(Self {
+            instance,
+            adapter,
             device,
             queue,
             adapter_info,
