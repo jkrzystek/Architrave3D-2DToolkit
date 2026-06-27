@@ -31,6 +31,7 @@ members = [
     "crates/toolkit_project",
     "crates/toolkit_skeleton",
     "crates/toolkit_texture_bake",
+    "crates/toolkit_procedural",
     "crates/toolkit_convex",
     "crates/toolkit_text",
     "crates/toolkit_lsystem",

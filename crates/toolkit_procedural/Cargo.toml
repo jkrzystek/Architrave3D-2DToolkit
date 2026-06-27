@@ -1,0 +1,13 @@
+[package]
+name = "toolkit_procedural"
+description = "Procedural generation algorithms (grid packing, 2.5D raymarching) for the 3D Rust Toolkit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+toolkit_core = { workspace = true }
+toolkit_geometry = { path = "../toolkit_geometry" }
+glam = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
