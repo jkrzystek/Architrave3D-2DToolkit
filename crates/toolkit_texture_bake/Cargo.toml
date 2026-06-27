@@ -13,6 +13,7 @@ toolkit_image = { workspace = true }
 toolkit_rng = { workspace = true }
 glam = { workspace = true }
 serde = { workspace = true }
+rayon = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

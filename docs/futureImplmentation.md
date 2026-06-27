@@ -77,3 +77,6 @@ These modules were originally listed as future possibilities.
 | `toolkit_convex` | Convex hull + GJK distance |
 | `toolkit_text` | SDF font atlas + text layout |
 | `toolkit_lsystem` / `toolkit_wfc` | Procedural content generators |
+
+## Future Baking Implementations
+- **GPU Compute Shaders**: Currently, texture baking (AO, curvature, normals) is heavily parallelized across CPU cores using Rayon. While this scales perfectly with high core count CPUs, we should ultimately implement WGPU Compute Shaders to run the physics BVH raycasting on the user's graphics card, which will drop bake times from seconds to milliseconds.

@@ -4,6 +4,8 @@
 //! written as raw bytes (no sRGB encoding).
 
 use glam::Vec3;
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use toolkit_geometry::{Aabb, Bvh, Mesh, Ray};
 use toolkit_image::Image;
 use toolkit_rng::Rng;
@@ -157,36 +159,64 @@ pub fn bake_ambient_occlusion(
     samples: u32,
     max_distance: f32,
     seed: u64,
+    num_threads: usize,
+    progress: impl Fn(f32) + Send + Sync,
 ) -> Image {
     let bvh = Bvh::build(mesh);
     let diag = (mesh.bounding_box().max - mesh.bounding_box().min).length();
     let bias = (diag * 1e-4).max(1e-5);
     let samples = samples.max(1);
 
+    let total_pixels = gb.height() as usize * gb.width() as usize;
+    let done_pixels = AtomicUsize::new(0);
+    
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(num_threads)
+        .build()
+        .unwrap_or_else(|_| rayon::ThreadPoolBuilder::new().build().unwrap());
+        
+    let mut pixels = vec![[255, 255, 255, 255]; total_pixels];
+    
+    pool.install(|| {
+        pixels.par_chunks_exact_mut(gb.width() as usize).enumerate().for_each(|(y, row)| {
+            let y = y as u32;
+            for (x, px) in row.iter_mut().enumerate() {
+                let x = x as u32;
+                let Some(s) = gb.at(x, y) else {
+                    let d = done_pixels.fetch_add(1, Ordering::Relaxed);
+                    if d % 1024 == 0 { progress(d as f32 / total_pixels as f32); }
+                    continue;
+                };
+                
+                let texel_index = (y as u64) * (gb.width() as u64) + x as u64;
+                let mut rng = Rng::seed_with_stream(seed, texel_index);
+
+                let origin = s.position + s.normal * bias;
+                let mut open = 0u32;
+                for _ in 0..samples {
+                    let dir = rng.on_hemisphere(s.normal);
+                    let ray = Ray::new(origin, dir);
+                    match bvh.intersect(&ray, mesh) {
+                        Some(hit) if hit.t <= max_distance => {}
+                        _ => open += 1,
+                    }
+                }
+                let ao = open as f32 / samples as f32;
+                let v = (ao * 255.0) as u8;
+                *px = [v, v, v, 255];
+                
+                let d = done_pixels.fetch_add(1, Ordering::Relaxed);
+                if d % 1024 == 0 { progress(d as f32 / total_pixels as f32); }
+            }
+        });
+    });
+
+    progress(1.0);
+    
     let mut img = Image::new(gb.width(), gb.height());
     for y in 0..gb.height() {
         for x in 0..gb.width() {
-            let Some(s) = gb.at(x, y) else {
-                img.set_pixel(x, y, [255, 255, 255, 255]);
-                continue;
-            };
-            // Per-texel stream keeps the bake stable and order-independent.
-            let texel_index = (y as u64) * (gb.width() as u64) + x as u64;
-            let mut rng = Rng::seed_with_stream(seed, texel_index);
-
-            let origin = s.position + s.normal * bias;
-            let mut open = 0u32;
-            for _ in 0..samples {
-                let dir = rng.on_hemisphere(s.normal);
-                let ray = Ray::new(origin, dir);
-                match bvh.intersect(&ray, mesh) {
-                    Some(hit) if hit.t <= max_distance => {}
-                    _ => open += 1,
-                }
-            }
-            let ao = open as f32 / samples as f32;
-            let v = (ao * 255.0) as u8;
-            img.set_pixel(x, y, [v, v, v, 255]);
+            img.set_pixel(x, y, pixels[(y * gb.width() + x) as usize]);
         }
     }
     img
@@ -218,7 +248,7 @@ mod tests {
     fn flat_plane_is_unoccluded() {
         let (mesh, gb) = plane_gb();
         // Rays go up into empty space, so a lone plane has no self-occlusion.
-        let ao = bake_ambient_occlusion(&mesh, &gb, 16, 5.0, 42);
+        let ao = bake_ambient_occlusion(&mesh, &gb, 16, 5.0, 42, 1, |_| {});
         // Find a covered texel and check it is bright (open).
         let mut found_bright = false;
         for y in 0..16 {
@@ -236,8 +266,8 @@ mod tests {
     #[test]
     fn ao_is_deterministic_for_seed() {
         let (mesh, gb) = plane_gb();
-        let a = bake_ambient_occlusion(&mesh, &gb, 8, 5.0, 7);
-        let b = bake_ambient_occlusion(&mesh, &gb, 8, 5.0, 7);
+        let a = bake_ambient_occlusion(&mesh, &gb, 8, 5.0, 7, 1, |_| {});
+        let b = bake_ambient_occlusion(&mesh, &gb, 8, 5.0, 7, 1, |_| {});
         assert_eq!(a, b);
     }
 
