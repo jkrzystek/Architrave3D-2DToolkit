@@ -66,7 +66,7 @@ impl Decimator {
         for (fi, f) in faces.iter().enumerate() {
             let (a, b, c) = (positions[f[0]], positions[f[1]], positions[f[2]]);
             let normal = (b - a).cross(c - a);
-            let q = Quadric::from_plane(normal, a);
+            let q = Quadric::from_plane_area_weighted(normal, a);
             for &v in f {
                 quadrics[v].add_assign(q);
                 vertex_faces[v].push(fi);
@@ -145,9 +145,11 @@ impl Decimator {
         let v_faces = std::mem::take(&mut self.vertex_faces[v]);
         self.vertex_faces[u].extend(v_faces);
 
-        // Kill faces that became degenerate (two corners now the same vertex).
-        let faces_of_u = self.vertex_faces[u].clone();
-        for fi in faces_of_u {
+        // Kill degenerate faces and collect neighbors in a single pass,
+        // using take/put-back to avoid cloning vertex_faces[u].
+        let u_faces = std::mem::take(&mut self.vertex_faces[u]);
+        let mut neighbors: HashSet<usize> = HashSet::new();
+        for &fi in &u_faces {
             if !self.alive[fi] {
                 continue;
             }
@@ -156,23 +158,15 @@ impl Decimator {
             if a == b || b == c || a == c {
                 self.alive[fi] = false;
                 self.alive_count -= 1;
-            }
-        }
-
-        // Refresh the edges around u.
-        let mut neighbors: HashSet<usize> = HashSet::new();
-        for fi in self.vertex_faces[u].clone() {
-            if !self.alive[fi] {
-                continue;
-            }
-            let face = self.faces[fi];
-            for &w in &face {
-                let rw = self.find(w);
-                if rw != u {
-                    neighbors.insert(rw);
+            } else {
+                for corner in [a, b, c] {
+                    if corner != u {
+                        neighbors.insert(corner);
+                    }
                 }
             }
         }
+        self.vertex_faces[u] = u_faces;
         for w in neighbors {
             self.push_edge(heap, u, w);
         }

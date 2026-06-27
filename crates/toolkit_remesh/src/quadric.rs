@@ -21,10 +21,39 @@ impl Quadric {
     }
 
     /// Quadric for the plane through `point` with unit `normal`.
+    ///
+    /// The input normal is normalized, so this produces a pure distance-only
+    /// quadric with no area weighting. Useful for user-specified constraint
+    /// planes where every plane should contribute equally regardless of size.
     pub fn from_plane(normal: Vec3, point: Vec3) -> Self {
         let n = normal.normalize_or_zero();
         let (a, b, c) = (n.x, n.y, n.z);
         let d = -n.dot(point);
+        Self {
+            m: [
+                a * a,
+                a * b,
+                a * c,
+                a * d,
+                b * b,
+                b * c,
+                b * d,
+                c * c,
+                c * d,
+                d * d,
+            ],
+        }
+    }
+
+    /// Area-weighted quadric for the triangle plane through `point` with raw
+    /// (un-normalized) `normal`.
+    ///
+    /// In standard QEM the normal is the raw cross product whose magnitude
+    /// equals twice the triangle area, so larger triangles naturally contribute
+    /// more error. This is the recommended constructor for mesh simplification.
+    pub fn from_plane_area_weighted(normal: Vec3, point: Vec3) -> Self {
+        let (a, b, c) = (normal.x, normal.y, normal.z);
+        let d = -normal.dot(point);
         Self {
             m: [
                 a * a,

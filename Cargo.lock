@@ -1666,9 +1666,7 @@ name = "toolkit_procedural"
 version = "0.1.0"
 dependencies = [
  "glam",
- "log",
  "serde",
- "toolkit_core",
  "toolkit_geometry",
 ]
 
